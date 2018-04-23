@@ -5,6 +5,8 @@ import math
 import matplotlib.pyplot as plt
 import time
 import os
+from scipy.stats import gaussian_kde
+
 ## TASK 3a + 3b +3c #######################################################
 
 filename = "housing.csv"
@@ -46,3 +48,23 @@ for header,column in zip(headers,list(zip(*data))):
     plt.title("Histogram for column '" + header+ "'")
     plt.savefig(directory + "/" + header + ".png", bbox_inches='tight')
 
+
+response3d = "Following categories would fit into a normal distribution: 'households', 'median_income', 'population', 'total_bedrooms', 'total_rooms'.  The distribution of 'housing_median_age' isn't clearly a normal distribution since the high amount of outlyers. The columns of 'latitude' and 'longitude' don't fit into the shape of a  normal distribution."
+print("\n",response3d)
+
+
+## TASK 3d #######################################################
+
+plt.gcf().clear()
+lg = list(list(zip(*data))[0])
+lat = list(list(zip(*data))[1])
+lg_lat = np.vstack([lg,lat])
+z = gaussian_kde(lg_lat)(lg_lat)
+plt.gcf().clear()
+plt.scatter(lg, lat, c=z, s=2.5, alpha=1)
+plt.savefig(directory + "/geographic_map_1" + ".png", bbox_inches='tight')
+
+plt.gcf().clear()
+plt.hist2d(lg, lat, (100,100), cmap=plt.cm.jet, alpha=1)
+plt.colorbar()
+plt.savefig(directory + "/geographic_map_2" + ".png", bbox_inches='tight')
