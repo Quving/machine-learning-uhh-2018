@@ -4,7 +4,7 @@ import csv
 import math
 import matplotlib.pyplot as plt
 import time
-
+import os
 ## TASK 3a + 3b +3c #######################################################
 
 filename = "housing.csv"
@@ -15,8 +15,9 @@ data = np.genfromtxt(filename,
         usecols=list(range(0,8)),
         dtype=None,
         delimiter=',')
-
-
+directory = "histograms"
+if not os.path.exists(directory):
+    os.makedirs(directory)
 # Because np. cannot parse strings, I use csv.reader to get the column names.
 with open(filename, "r") as csvfile:
     reader = csv.reader(csvfile, delimiter=',')
@@ -43,5 +44,5 @@ for header,column in zip(headers,list(zip(*data))):
     plt.gcf().clear()
     plt.hist(a, bins='auto')
     plt.title("Histogram for column '" + header+ "'")
-    plt.savefig(header + ".png", bbox_inches='tight')
+    plt.savefig(directory + "/" + header + ".png", bbox_inches='tight')
 
