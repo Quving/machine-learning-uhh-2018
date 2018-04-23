@@ -7,19 +7,26 @@ import time
 import os
 from scipy.stats import gaussian_kde
 
-## TASK 3a + 3b +3c #######################################################
 
 filename = "housing.csv"
-bin_total = 50.0
+hist_dir = "histograms"
+gmap_dir = "geographic_maps"
+bin_total = 50
+
 data_props = {}
 data = np.genfromtxt(filename,
         skip_header=1,
         usecols=list(range(0,8)),
         dtype=None,
         delimiter=',')
-directory = "histograms"
-if not os.path.exists(directory):
-    os.makedirs(directory)
+
+
+directories = [hist_dir, gmap_dir]
+for directory in directories:
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+## TASK 3a + 3b +3c #######################################################
 # Because np. cannot parse strings, I use csv.reader to get the column names.
 with open(filename, "r") as csvfile:
     reader = csv.reader(csvfile, delimiter=',')
@@ -46,7 +53,7 @@ for header,column in zip(headers,list(zip(*data))):
     plt.gcf().clear()
     plt.hist(a, bins='auto')
     plt.title("Histogram for column '" + header+ "'")
-    plt.savefig(directory + "/" + header + ".png", bbox_inches='tight')
+    plt.savefig(hist_dir + "/" + header + ".png", bbox_inches='tight')
 
 
 response3d = "Following categories would fit into a normal distribution: 'households', 'median_income', 'population', 'total_bedrooms', 'total_rooms'.  The distribution of 'housing_median_age' isn't clearly a normal distribution since the high amount of outlyers. The columns of 'latitude' and 'longitude' don't fit into the shape of a  normal distribution."
@@ -55,16 +62,28 @@ print("\n",response3d)
 
 ## TASK 3d #######################################################
 
-plt.gcf().clear()
+def plot_geographic_map_1(lg, lat):
+    plt.gcf().clear()
+    lg_lat = np.vstack([lg,lat])
+    z = gaussian_kde(lg_lat)(lg_lat)
+    plt.title("Geographic map 1")
+    plt.scatter(lg, lat, c=z, s=2.5, alpha=1)
+    plt.savefig(gmap_dir + "/geographic_map_1" + ".png", bbox_inches='tight')
+
+def plot_geographic_map_2(lg, lat):
+    plt.gcf().clear()
+    plt.hist2d(lg, lat, (100,100), cmap=plt.cm.jet, alpha=1)
+    plt.colorbar()
+    plt.title("Geographic map 2")
+    plt.savefig(gmap_dir+"/geographic_map_2" + ".png", bbox_inches='tight')
+
+
 lg = list(list(zip(*data))[0])
 lat = list(list(zip(*data))[1])
-lg_lat = np.vstack([lg,lat])
-z = gaussian_kde(lg_lat)(lg_lat)
-plt.gcf().clear()
-plt.scatter(lg, lat, c=z, s=2.5, alpha=1)
-plt.savefig(directory + "/geographic_map_1" + ".png", bbox_inches='tight')
 
-plt.gcf().clear()
-plt.hist2d(lg, lat, (100,100), cmap=plt.cm.jet, alpha=1)
-plt.colorbar()
-plt.savefig(directory + "/geographic_map_2" + ".png", bbox_inches='tight')
+plot_geographic_map_1(lg, lat)
+plot_geographic_map_2(lg, lat)
+
+
+## TASK 3e #######################################################
+
