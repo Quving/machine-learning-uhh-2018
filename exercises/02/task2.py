@@ -2,6 +2,14 @@
 
 import numpy as np
 
+
+response2d = "Indeed suspicious, the solutions of the check || h_k * x_k -b || should be a vector of zeros.  But through python's rounding it is possible that the equations solutions are not 100 percent precise resulting in very small numbers instead of zero after check."
+
+
+
+response2e = "It's oberverable that the condition number increases very fast by increasingly dimension of the hilbert matrix. The condition number associated with the linear equation Ax = b gives a bound on how inaccurate the solution x will be after approximation.  Note that this is before the effects of round-off error are taken into account; conditioning is a property of the matrix, not the algorithm or floating point accuracy of the computer used to solve the corresponding system."
+
+
 ## TASK 2a ###############################################################
 
 # Generate a Hilbert Matrix for a given dimension.
@@ -14,9 +22,6 @@ def generateHilberMat(dimension):
         mat.append(row)
     return mat
 
-hmat = generateHilberMat(3)
-for row in hmat:
-    print(row)
 
 ## TASK 2b ###############################################################
 
@@ -27,12 +32,6 @@ def calculateMatrixRank(matrix):
 # Returns the condition number  of a given matrix.
 def calculateMatrixCondition(matrix):
     return np.linalg.cond(matrix)
-
-for k in [1,30]:
-    hilmat = generateHilberMat(k)
-    rank = calculateMatrixRank(hilmat)
-    cond = calculateMatrixCondition(hilmat)
-    print("Hilbert-Matrix of dimension", k, "has a rank of", rank, "and cond of", cond)
 
 
 ## TASK 2c ###############################################################
@@ -48,22 +47,23 @@ def solveXforHilbert(dimension):
     else:
         return []
 
-for k in [1,2,3,4,10,15,20,30,50,100]:
-    print("\nk:", k, " ===============================================================================")
-    print("x: ", solveXforHilbert(k))
 
 
-## TASK 2d ###############################################################
+if __name__ == "__main__":
+    hmat = generateHilberMat(3) # Task 2a
+    for row in hmat:
+        print(row)
 
-response2d = "Indeed suspicious, the solutions of the check || h_k * x_k -b || should be a vector of zeros.  But through python's rounding it is possible that the equations solutions are not 100 percent precise resulting in very small numbers instead of zero after check."
+    for k in [1,30]: # Task 2b
+        hilmat = generateHilberMat(k)
+        rank = calculateMatrixRank(hilmat)
+        cond = calculateMatrixCondition(hilmat)
+        print("Hilbert-Matrix of dimension", k, "has a rank of", rank, "and cond of", cond)
 
-print("\n", response2d)
+    for k in [1,2,3,4,10,15,20,30,50,100]: # Task 2c
+        print("\nk:", k, " ===============================================================================")
+        print("x: ", solveXforHilbert(k))
 
-## TASK 2e ###############################################################
+    print("\n", response2e) # Task 2e
 
-response2e = "It's oberverable that the condition number increases very fast by increasingly dimension of the hilbert matrix. The condition number associated with the linear equation Ax = b gives a bound on how inaccurate the solution x will be after approximation.  Note that this is before the effects of round-off error are taken into account; conditioning is a property of the matrix, not the algorithm or floating point accuracy of the computer used to solve the corresponding system."
-
-print("\n", response2e)
-
-
-
+    print("\n", response2d) # Task 2d
