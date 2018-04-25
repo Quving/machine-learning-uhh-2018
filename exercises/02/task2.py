@@ -61,7 +61,7 @@ if __name__ == "__main__":
         print("Hilbert-Matrix of dimension", k, "has a rank of", rank, "and cond of", cond)
 
     for k in [1,2,3,4,10,15,20,30,50,100]: # Task 2c
-        print("\nk:", k, " ===============================================================================")
+        print("\nk:", k)
         print("x: ", solveXforHilbert(k))
 
     print("\n", response2e) # Task 2e
