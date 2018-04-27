@@ -38,6 +38,19 @@ def task1c():
             plot_title="Histogram of binomial distribution.",
             save_as="1c.png")
 
+def task1d():
+    m = [2, 3, 5, 10, 20]
+    min_rand, max_rand = 0, 1000
+    for current_m in m:
+        summed_randoms = []
+        for random_sum in range(0, desired_list_size):
+            summed_element = sum(random.sample(range(min_rand, max_rand), current_m))
+            summed_randoms.append(summed_element)
+        plot_histogram(
+                raw_list=summed_randoms,
+                plot_title="Histogram of summed randoms distribution. m = "+ str(current_m),
+                save_as="1d_m"+ str(current_m) +".png")
+
 def plot_histogram(raw_list, plot_title, save_as):
     max_value = max(raw_list)
     min_value = min(raw_list)
@@ -47,7 +60,7 @@ def plot_histogram(raw_list, plot_title, save_as):
     plt.hist(a, bins='auto')
     plt.title(plot_title)
     plt.savefig(save_as, bbox_inches='tight')
-
-task1a()
-task1b()
-task1c()
+# task1a()
+# task1b()
+# task1c()
+task1d()
