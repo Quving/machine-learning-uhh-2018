@@ -3,12 +3,18 @@
 import numpy as np
 import random
 import matplotlib.pyplot as plt
-
+import time
+import os
 
 random_seed = 128
-desired_list_size = 1000
+desired_list_size = 10000
 desired_bin_numbers = 50
 random.seed(random_seed)
+plots_dir = "plots/"
+
+for directory in [plots_dir]:
+    if not os.path.exists(directory):
+        os.makedirs(directory)
 
 def task1a():
     min_rand, max_rand = 0, 1000
@@ -28,7 +34,7 @@ def task1b():
         plt.plot(bins, 1/(sigma * np.sqrt(2 * np.pi)) *
                 np.exp( - (bins - mu)**2 / (2 * sigma**2) ),
                 linewidth=2, color='r')
-        plt.savefig("1b.png", bbox_inches='tight')
+        plt.savefig(plots_dir + "1b.png", bbox_inches='tight')
 
 def task1c():
     n, p  = 20, 0.5
@@ -59,8 +65,33 @@ def plot_histogram(raw_list, plot_title, save_as):
     plt.gcf().clear()
     plt.hist(a, bins='auto')
     plt.title(plot_title)
-    plt.savefig(save_as, bbox_inches='tight')
-# task1a()
-# task1b()
-# task1c()
+    plt.savefig(plots_dir + save_as, bbox_inches='tight')
+
+def in_circle(a,b,r):
+    a = np.array(a)
+    b = np.array(b)
+    return r <= np.linalg.norm(a-b)
+
+def task1e():
+    min_rand, max_rand = 0, 1000
+    rand_coordinates = [random.sample(range(min_rand, max_rand), 2) for x in range(desired_list_size)]
+    rands_in_circle, rands_out_circle = [], []
+    for coord in rand_coordinates:
+        if in_circle(coord, [max_rand/2, max_rand/2], max_rand/2):
+            rands_in_circle.append(coord)
+        else:
+            rands_out_circle.append(coord)
+
+    xy_in = list(zip(*rands_in_circle))
+    xy_out = list(zip(*rands_out_circle))
+
+    plt.gcf().clear()
+    plt.scatter(xy_in[0], xy_in[1], s=2.5, alpha=1)
+    plt.scatter(xy_out[0], xy_out[1], s=2.5, alpha=1)
+    plt.savefig(plots_dir + "1e.png", bbox_inches='tight')
+
+task1a()
+task1b()
+task1c()
 task1d()
+task1e()
