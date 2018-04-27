@@ -13,7 +13,10 @@ random.seed(random_seed)
 def task1a():
     min_rand, max_rand = 0, 1000
     uniform_randoms = random.sample(range(min_rand, max_rand), desired_list_size)
-    plot_histogram(uniform_randoms, "Histogram of normal random distribution.", "1a.png")
+    plot_histogram(
+            raw_list = uniform_randoms,
+            plot_title= "Histogram of normal random distribution.",
+            save_as = "1a.png")
     print("Because the set is generated randomly, the dataset's distribution is balanced. That means every element occurs in an equal density.")
 
 def task1b():
@@ -30,17 +33,20 @@ def task1b():
 def task1c():
     n, p  = 20, 0.5
     binom_randoms = np.random.binomial(n, p, desired_list_size)
-    plot_histogram(binom_randoms, "Histogram of binomial distribution.", "1c.png")
+    plot_histogram(
+            raw_list=binom_randoms,
+            plot_title="Histogram of binomial distribution.",
+            save_as="1c.png")
 
-def plot_histogram(raw_list, name, save_as):
+def plot_histogram(raw_list, plot_title, save_as):
     max_value = max(raw_list)
     min_value = min(raw_list)
     bin_size = max_value/ float(desired_bin_numbers)
     a = np.hstack((raw_list, list(np.arange(min_value, max_value, bin_size))))
     plt.gcf().clear()
     plt.hist(a, bins='auto')
-    plt.title(name)
-    plt.savefig("hist_1c.png", bbox_inches='tight')
+    plt.title(plot_title)
+    plt.savefig(save_as, bbox_inches='tight')
 
 task1a()
 task1b()
