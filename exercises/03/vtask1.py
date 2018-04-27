@@ -90,8 +90,9 @@ def task1e():
     plt.scatter(xy_out[0], xy_out[1], s=2.5, alpha=1)
     plt.savefig(plots_dir + "1e.png", bbox_inches='tight')
 
-task1a()
-task1b()
-task1c()
-task1d()
-task1e()
+if __name__ == "__main__":
+    task1a()
+    task1b()
+    task1c()
+    task1d()
+    task1e()
