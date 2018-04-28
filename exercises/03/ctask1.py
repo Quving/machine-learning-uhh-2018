@@ -74,22 +74,30 @@ def task1c():
 
 def task1d():
 
+    # Dev: Start timer
     starttime = time.time()
-    number_of_rand_numbers = [2,3,5,10,20,]
 
+    # Settings
+    number_of_rand_numbers = [2,3,5,10,20]
+
+    # open plot
     plt.figure(1)
 
+    # Iterator
     iterator = 1
 
     for i in number_of_rand_numbers:
 
-        result = np.random.random(1000,)
+        result = None
 
-        for j in range(i):
-            result = result + np.random.random(1000,)
+        for j in range(i-1):
+            if result is None:
+                result = np.random.random(1000,)
+            else: 
+                result = result + np.random.random(1000,)
 
-        plt.hist(result, i)
-        # plt.scatter(result,i)
+        plt.hist(result)
+        #plt.scatter(i, result)
         plt.subplot(2,3, iterator)
 
         iterator += 1
@@ -107,7 +115,20 @@ def task1d():
     # Plotte die Liste fuer das jeweilige m.
     
 
-task1d()
+def task1e():
+
+    result = np.random.random(1000,)
+    r = 1
+
+    result = np.sqrt(-result**2 + r**2)
+
+    plt.hist(result)
+
+    print(result)
+
+    plt.show()
+
+task1e()
 
 # d. Maybe combining multiple random numbers is even better than using single ones?
 # Use numpy to generate new random numbers from a sum of individual numbers, si = 􏰕Mj=1 rj, where the rj are generated from a uniform distribution. Plot scatter plots and histograms of the resulting data sets for M ∈ [2, 3, 5, 10, 20].
