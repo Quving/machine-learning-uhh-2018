@@ -45,7 +45,7 @@ def filter_data(data, label, numbers):
 def knn_digit_classifier(numbers):
 
     starttime = time.time()
-
+    print("----------------------------------------")
     print("Building the datasets...")
     f_training_data, f_training_label = filter_data(training_data, training_label, numbers)
     f_test_data, f_test_label = filter_data(test_data, test_label, numbers)
@@ -80,20 +80,37 @@ def knn_digit_classifier(numbers):
     k = 1,3,5,7,10,15
 
     scores = np.array([])
+    prediction_probs = np.array([])
 
     print("Start training and classifying. Calculating the scores...")
     for i in k:
-        classifier = KNeighborsClassifier(i)
+
+        # Instantiate learning model
+        classifier = KNeighborsClassifier(n_neighbors=i)
+
+        # Fitting the model
         classifier.fit(training_data, training_label.ravel())
+
+        # Predict the response
+        prediction = classifier.prediction(training_data)
+        prediction_prob = classifier.predict_proba(training_data)
+        prediction_probs = np.append(prediction_probs, [prediction_prob])
+
         score = classifier.score(test_data, test_label)
         scores = np.append(scores, [score])
+
     
     print("Finished. Plotting now result graphics.")
 
     # plot training and test errorsgit 
     plt.gcf().clear()
+    print("Prediction probabilities: {}".format(prediction_probs))
     print("Scores: {}, Numbers: {}".format(scores, numbers))
     plt.plot(k,scores, color="g")
+    plt.title("KNN Classifier. Classified digits: {}".format(numbers))
+    plt.xlabel('number of neighbours (k)')
+    plt.ylabel('score')
+    plt.grid(True)
     plt.savefig('ctask3-knn' + str(numbers).strip('[]').replace(', ','') + '.png', bbox_inches='tight')
     
     endtime = time.time() - starttime
@@ -118,3 +135,7 @@ if __name__ == "__main__":
     # Compare performance
 
     knn_digit_classifier([3,4,5,6,7,8])
+
+    # What about 3 and 8?
+
+    knn_digit_classifier([3,8])
