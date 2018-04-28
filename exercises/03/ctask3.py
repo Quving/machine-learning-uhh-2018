@@ -2,6 +2,9 @@ import numpy as np
 from matplotlib import pyplot as plt
 from scipy import io
 from sklearn.neighbors import KNeighborsClassifier
+import time
+import resource
+import platform
 
 
 # knn classifier to recognize digits
@@ -39,7 +42,11 @@ def filter_data(data, label, numbers):
     
     return data[filter.flatten()], label[filter.flatten()]
 
-def kmeans_digit_classifier(numbers):
+def knn_digit_classifier(numbers):
+
+    starttime = time.time()
+
+    print("Building the datasets...")
     f_training_data, f_training_label = filter_data(training_data, training_label, numbers)
     f_test_data, f_test_label = filter_data(test_data, test_label, numbers)
 
@@ -48,6 +55,9 @@ def kmeans_digit_classifier(numbers):
     # Every tenth
     number_of_images = 10
     breakint = 0
+
+
+    print("Plotting {} images".format(number_of_images))
     for i in range(len(f_training_data)):
         
         # Reshape them into 16 x 16
@@ -71,25 +81,40 @@ def kmeans_digit_classifier(numbers):
 
     scores = np.array([])
 
+    print("Start training and classifying. Calculating the scores...")
     for i in k:
         classifier = KNeighborsClassifier(i)
-        classifier.fit(training_data, training_label)
+        classifier.fit(training_data, training_label.ravel())
         score = classifier.score(test_data, test_label)
         scores = np.append(scores, [score])
-        print(score)
+    
+    print("Finished. Plotting now result graphics.")
 
-    # plot training and test errors
+    # plot training and test errorsgit 
     plt.gcf().clear()
-    print(scores)
+    print("Scores: {}, Numbers: {}".format(scores, numbers))
     plt.plot(k,scores, color="g")
-    plt.savefig('ctask3-kmeans' + str(numbers) + '.png', bbox_inches='tight')
-    plt.show()
+    plt.savefig('ctask3-knn' + str(numbers).strip('[]').replace(', ','') + '.png', bbox_inches='tight')
+    
+    endtime = time.time() - starttime
 
-kmeans_digit_classifier([2,3])
+    # Calculate Bytes to megabytes, based on OS
+    b_to_mb = 0
+    if platform.system() == "Darwin":
+        b_to_mb = 1000000
+    else:
+        b_to_mb = 1000
+    
+    memory = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / b_to_mb
 
-####### 3 to 8 comparison
-### D: Classify other digits
-# Run algorithm for digits: 3,4,5,6,7,8
-# Compare performance
+    print("Finished. Processing time: {}s. Memory usage: {}mb".format(endtime, memory))
 
-kmeans_digit_classifier([3,4,5,6,7,8])
+if __name__ == "__main__":
+    knn_digit_classifier([2,3])
+
+    ####### 3 to 8 comparison
+    ### D: Classify other digits
+    # Run algorithm for digits: 3,4,5,6,7,8
+    # Compare performance
+
+    knn_digit_classifier([3,4,5,6,7,8])
