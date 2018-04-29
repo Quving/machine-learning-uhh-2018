@@ -42,6 +42,30 @@ def filter_data(data, label, numbers):
         filter += label == i   
     return data[filter.flatten()], label[filter.flatten()]
 
+def plot_images_from_arrays(data,number_of_images, filename):
+    print("Plotting {} images".format(number_of_images))
+
+    breakint = 0
+
+    for i in range(len(data)):
+        
+        # Reshape them into 16 x 16
+        img = data[i].reshape(16,16)
+
+        plt.gcf().clear()
+
+        # Plot with pyplot.imshow and cmap='grey'
+        plt.imshow(img, cmap='gray')
+
+        save_as = filename + '_' + str(i) + '.png'
+        plt.savefig(img_plots_dir + '/' + save_as, bbox_inches='tight')
+
+        i += 10
+        breakint += 1
+
+        if breakint is number_of_images:
+            break
+
 def knn_digit_classifier(numbers):
 
     starttime = time.time()
@@ -52,29 +76,8 @@ def knn_digit_classifier(numbers):
     ### B: Plot images
     # Choose some images
     # Every tenth
-    number_of_images = 10
-    breakint = 0
-
-
-    print("Plotting {} images".format(number_of_images))
-    for i in range(len(f_training_data)):
-        
-        # Reshape them into 16 x 16
-        img = f_training_data[i].reshape(16,16)
-
-        plt.gcf().clear()
-
-        # Plot with pyplot.imshow and cmap='grey'
-        plt.imshow(img, cmap='gray')
-
-        save_as = str(i) + '.' + str(numbers).strip('[]').replace(', ','') + '.png'
-        plt.savefig(img_plots_dir + '/' + save_as, bbox_inches='tight')
-
-        i += 10
-        breakint += 1
-
-        if breakint is number_of_images:
-            break
+    img_filename = str(numbers).strip('[]').replace(', ','')
+    plot_images_from_arrays(f_training_data,10, img_filename)
 
     ### C: Evaluate
     # Test classifier with values k = 1,3,5,7,10,15
