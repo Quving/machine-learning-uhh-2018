@@ -17,7 +17,8 @@ import platform
 
 fn_training =   'usps_train.mat'
 fn_test =       'usps_test.mat'
-plots_dir =     'ctask3_img'
+img_plots_dir = 'ctask3_img'
+knn_plots_dir = 'ctask3_knn'
 
 
 ####### 2 vs. 3 comparison
@@ -61,11 +62,13 @@ def knn_digit_classifier(numbers):
         # Reshape them into 16 x 16
         img = f_training_data[i].reshape(16,16)
 
+        plt.gcf().clear()
+
         # Plot with pyplot.imshow and cmap='grey'
         plt.imshow(img, cmap='gray')
 
-        save_as = str(i) + '.png'
-        plt.savefig(plots_dir + '/' + save_as, bbox_inches='tight')
+        save_as = str(i) + '.' + str(numbers).strip('[]').replace(', ','') + '.png'
+        plt.savefig(img_plots_dir + '/' + save_as, bbox_inches='tight')
 
         i += 10
         breakint += 1
@@ -77,7 +80,8 @@ def knn_digit_classifier(numbers):
     # Test classifier with values k = 1,3,5,7,10,15
     k = 1,3,5,7,10,15
 
-    scores = np.array([])
+    training_scores = np.array([])
+    test_scores = np.array([])
     prediction_probs = np.array([])
 
     print("Start training and classifying. Calculating the scores...")
@@ -89,27 +93,29 @@ def knn_digit_classifier(numbers):
         # Fitting the model
         classifier.fit(f_training_data, f_training_label.ravel())
 
-        # Predict the response
-        prediction = classifier.predict(f_training_data)
-        prediction_prob = classifier.predict_proba(f_training_data)
-        prediction_probs = np.append(prediction_probs, [prediction_prob])
+        # Scoring
+        training_score = classifier.score(f_training_data, f_training_label)
+        training_scores = np.append(training_scores, [training_score])
 
-        score = classifier.score(f_test_data, f_test_label)
-        scores = np.append(scores, [score])
-
+        test_score = classifier.score(f_test_data, f_test_label)
+        test_scores = np.append(test_scores, [test_score])
     
     print("Finished. Plotting now result graphics.")
 
     # plot training and test errorsgit 
     plt.gcf().clear()
+    ki = [i for i in range(0, len(k))]
     print("Prediction probabilities: {}".format(prediction_probs))
-    print("Scores: {}, Numbers: {}".format(scores, numbers))
-    plt.plot(k,scores, color="g")
+    plt.xticks(ki, k)
+    print("Numbers: {}, Training Performance: {}, Test Performance: {}".format(numbers, training_scores, test_scores))
+    plt.plot(ki,training_scores, color="g", label="Training Performance", marker='o')
+    plt.plot(ki,test_scores, color="r", label="Test Performance", marker='o')
     plt.title("KNN Classifier. Classified digits: {}".format(numbers))
-    plt.xlabel('number of neighbours (k)')
-    plt.ylabel('score')
+    plt.xlabel('Number of neighbours (k)')
+    plt.ylabel('Performance')
+    plt.legend()
     plt.grid(True)
-    plt.savefig('ctask3-knn' + str(numbers).strip('[]').replace(', ','') + '.png', bbox_inches='tight')
+    plt.savefig(knn_plots_dir + '/' + str(numbers).strip('[]').replace(', ','') + '.png', bbox_inches='tight')
     
     endtime = time.time() - starttime
 
