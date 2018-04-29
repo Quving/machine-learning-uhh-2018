@@ -38,8 +38,7 @@ def filter_data(data, label, numbers):
     for i in numbers:
         if filter is None:
             filter = label == i
-        filter += label == i
-    
+        filter += label == i   
     return data[filter.flatten()], label[filter.flatten()]
 
 def knn_digit_classifier(numbers):
@@ -49,7 +48,6 @@ def knn_digit_classifier(numbers):
     print("Building the datasets...")
     f_training_data, f_training_label = filter_data(training_data, training_label, numbers)
     f_test_data, f_test_label = filter_data(test_data, test_label, numbers)
-
     ### B: Plot images
     # Choose some images
     # Every tenth
@@ -89,14 +87,14 @@ def knn_digit_classifier(numbers):
         classifier = KNeighborsClassifier(n_neighbors=i)
 
         # Fitting the model
-        classifier.fit(training_data, training_label.ravel())
+        classifier.fit(f_training_data, f_training_label.ravel())
 
         # Predict the response
-        prediction = classifier.prediction(training_data)
-        prediction_prob = classifier.predict_proba(training_data)
+        prediction = classifier.predict(f_training_data)
+        prediction_prob = classifier.predict_proba(f_training_data)
         prediction_probs = np.append(prediction_probs, [prediction_prob])
 
-        score = classifier.score(test_data, test_label)
+        score = classifier.score(f_test_data, f_test_label)
         scores = np.append(scores, [score])
 
     
@@ -137,5 +135,7 @@ if __name__ == "__main__":
     knn_digit_classifier([3,4,5,6,7,8])
 
     # What about 3 and 8?
-
     knn_digit_classifier([3,8])
+
+    # 1 vs. 7
+    knn_digit_classifier([1,7])
