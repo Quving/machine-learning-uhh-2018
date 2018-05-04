@@ -56,7 +56,7 @@ def task1a():
     # boys / girls, 
     classes, counts = distribution_of(gender)
     print("Gender: {}".format(np.vstack([classes,counts])))
-    plotter.bars(counts, x_ticks=['male', 'female'], title="1A: Gender", normalize=False)
+    plotter.bars(counts, x_ticks=['female', 'male'], title="1A: Gender", normalize=False)
 
     # age 
     classes, counts = distribution_of(age)
@@ -110,14 +110,16 @@ def task1b():
 
     # ...having a vaccination against disease X
     diseaseX_prob = marginal_probability(diseaseX, diseaseX[diseaseX[:] == 1])
-    print(diseaseX_prob)
+    print("Empirical probability of disease X: {}%".format(diseaseX_prob*100))
 
 
     # ...living on the country side
-    print(residence)
-    # countryside_prob = 
+    residence_prob = marginal_probability(residence, residence[residence[:] == 1])
+    print("Empirical probability of living on the country side: {}%".format(residence_prob*100))
 
     # ...having at least one older sibling
+    olderSiblings_prob = marginal_probability(olderSiblings, olderSiblings[olderSiblings[:] > 1])
+    print("Empirical probability of having > 1 older siblings: {}%".format(olderSiblings_prob*100))
 
 
 ### C: Preprocessing
