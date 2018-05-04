@@ -42,13 +42,13 @@ def task1a():
 
     print('''
     ------------------------------------
-    Task 1
+    Task 1.A
     ------------------------------------
     GOAL: extract data from CSV, 
-    determine number of boys / girls, age diseases and olderSiblings,
-    Plot with Bar plots
+          determine number of boys / girls, age diseases and olderSiblings,
+          Plot with Bar plots
     
-    Numbers:''')
+    Results:''')
 
     # Overall data characteristics
     print("Number of samples: {}".format(len(gender)))
@@ -56,31 +56,31 @@ def task1a():
     # boys / girls, 
     classes, counts = distribution_of(gender)
     print("Gender: {}".format(np.vstack([classes,counts])))
-    plotter.bars(counts, x_ticks=['male', 'female'], title="Gender", normalize=False)
+    plotter.bars(counts, x_ticks=['male', 'female'], title="1A: Gender", normalize=False)
 
     # age 
     classes, counts = distribution_of(age)
     print("Ages: {}".format(np.vstack([classes,counts])))
-    plotter.bars(counts, classes, title="Age distribution", normalize=False)
+    plotter.bars(counts, classes, title="1A: Age distribution", normalize=False)
 
     # knows to ride a bike
     print("Knows how to ride a bike: {}".format(knowsToRideABike.sum()))
-    plotter.bool_bars(knowsToRideABike, title="Knows how to ride a bike", normalize=False)
+    plotter.bool_bars(knowsToRideABike, title="1A: Knows how to ride a bike", normalize=False)
 
     # vaccines for disease x
     print("vacX: {}".format(vacX.sum()))
-    plotter.bool_bars(vacX, title="Vaccined against disease X", normalize=False)
+    plotter.bool_bars(vacX, title="1A: Vaccined against disease X", normalize=False)
 
     # diseases
     print("diseaseX: {}".format(diseaseX.sum()))
     print("diseaseY: {}".format(diseaseY.sum()))
     print("diseaseZ: {}".format(diseaseZ.sum()))
-    plotter.bars(np.array(list(diseases.values())), np.array(list(diseases.keys())), title="Disease distribution", normalize=False)
+    plotter.bars(np.array(list(diseases.values())), np.array(list(diseases.keys())), title="1A: Disease distribution", normalize=False)
 
     # olderSiblings
     classes, counts = distribution_of(olderSiblings)
     print("OlderSiblings: {}".format([classes,counts]))
-    plotter.bool_bars(olderSiblings, title="Number of older siblings", normalize=False)
+    plotter.bool_bars(olderSiblings, title="1A: Number of older siblings", normalize=False)
 
 
 ### B: Marginal properties
@@ -89,12 +89,35 @@ def task1a():
 # ...living on the country side
 # ...having at least one older sibling
 
+def marginal_probability(rows,rows_with_a):
+    return len(rows_with_a) / len(rows)
 
-# Write a probability calculation method
-# Calculate:
-# ...having a vaccination against disease X
-# ...living on the country side
-# ...having at least one older sibling
+def task1b():
+    print('''
+    ------------------------------------
+    Task 1.B
+    ------------------------------------
+    GOAL: Calculate empirical probability for...
+          ...having a vaccination against disease X
+          ...living on the country side
+          ...having at least one older sibling
+          
+          Calculate a variable diseaseYZ and 
+          calculate the empirical probability for it.
+
+    Results:''')
+
+
+    # ...having a vaccination against disease X
+    diseaseX_prob = marginal_probability(diseaseX, diseaseX[diseaseX[:] == 1])
+    print(diseaseX_prob)
+
+
+    # ...living on the country side
+    print(residence)
+    # countryside_prob = 
+
+    # ...having at least one older sibling
 
 
 ### C: Preprocessing
@@ -116,4 +139,5 @@ def task1a():
 ### E
 
 if __name__ == "__main__":
-    task1a()
+    # task1a()
+    task1b()
