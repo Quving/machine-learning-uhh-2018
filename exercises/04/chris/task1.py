@@ -80,7 +80,7 @@ def task1a():
     print("diseaseX: {}".format(diseaseX.sum()))
     print("diseaseY: {}".format(diseaseY.sum()))
     print("diseaseZ: {}".format(diseaseZ.sum()))
-    plotter.bars(np.array(list(diseases.values())), np.array(list(diseases.keys())), title="1A: Has / had the disease X/Y/Z", normalize=False, show=False, filename="diseases")
+    plotter.bars(np.array(list(diseases.values())), np.array(list(diseases.keys())), title="1A: Has / had the disease X/Y/Z", normalize=False, show=False, filename="1a_diseases")
 
     # olderSiblings
     classes, counts = distribution_of(olderSiblings)
@@ -142,31 +142,88 @@ def task1c():
 
     Results:''')
 
+    global isTallerThan1Meter
+    global isHeavierThan40Kilograms
+
     isTallerThan1Meter = (height[:] > 100).astype(np.float32)
     isHeavierThan40Kilograms = (weight[:] > 40).astype(np.float32)
 
     # Combine diseaseY and diseaseZ and calculate empirical probability
+    global diseaseYZ
+    global diseaseYZ_prob
     diseaseYZ = diseaseY + diseaseZ
     diseaseYZ_prob = marginal_probability(diseaseYZ, diseaseYZ[diseaseYZ[:] == 1])
     print("Empirical probability of disease Y or Z: {}%".format(diseaseYZ_prob*100))
 
 
 ### D: Conditional Probabilities
-def conditional_probability(rows_with_a, rows_with_b, label_a="", label_b=""):
+def conditional_probability(rows_with_a, rows_with_b):
     return (len(rows_with_a) + len(rows_with_b)) / len(rows_with_b)
 
-def conditional_probabilities(rows_with_a, rows_with_b, conditions_for_b, label_a="", label_b=""):
+def conditional_probabilities(dataset_a, dataset_b, conditions_for_b, conditions_for_a=[1], label_a="", label_b=""):
 
-    print('Calculating probability for combination {} and {} = {}.'.format(label_a,label_b, conditions_for_b))
+    '''
+    Calculates the contitional probabilities for two datasets A and B with CONDITIONS for A and CONDITIONS for B the following:
+    1) For each CONDITION for A:
+    1.1) For each CONDITION for B:
+    1.1.1) Calculate the conditional probability for P(A = CONDITION | B = CONDITION)
+
+    The return value is an array, containing all probabilities for all P(A = CONDITIONS | B = CONDITIONS)
+    '''
+
+    print('\nCalculating probability for combination: {}, given {} = {}.'.format(label_a,label_b, conditions_for_b))
 
     probabilities = np.array([])
 
-    for condition in conditions_for_b:
-        probab = conditional_probability(rows_with_a, rows_with_b[rows_with_b[:] == condition], label_a=label_a, label_b=label_b)
-        print('Probability for condition {} == {}: {}'.format(label_b, condition, probab))
-        probabilities = np.append(probabilities, probab)
+    for condition_a in conditions_for_a:
+        for condition_b in conditions_for_b:
+            print("- Condition: A: {} == {}, B: {} == {} -------------------".format(label_a, condition_a, label_b, condition_b))
 
+            # Prepare coditions by filtering datasets
+            dataset_a_f = dataset_a[dataset_a[:] == condition_a] # is immer boolean
+            dataset_b_f = dataset_b[dataset_b[:] == condition_b]
+
+            probab = conditional_probability(dataset_a_f, dataset_b_f)
+            print('Conditional probability: {}'.format(probab))
+            probabilities = np.append(probabilities, probab)
     return probabilities
+
+
+def conditional_probabilities_threefolded(dataset_a, dataset_b, dataset_c, conditions_for_b, conditions_for_c, conditions_for_a=[1], label_a="", label_b="", label_c=""):
+    '''
+    Calculates the conditional probabilities of P(A|B = CONDITIONS, C = CONDITIONS) by following:
+    1) Filter dataset A and B by C = CONDITIONS
+    2) For each CONDITIONS for C:
+    2.1) For each CONDITIONS for B_f (filtered):
+    2.1.1) Calculate the conditional probability for P(A_f|B_f = CONDITION)
+
+    The result gets saved as a M x N matrix. Each row contains the probabilities for P(A | B = CONDITIONS)
+    '''
+
+    probabilities = np.array([])
+
+    print("\nStarting threefolded conditional probabilities analysis.\n\nDataset: \n{} with {} items\n{} with {} items\n{} with {} items".format(label_a, len(dataset_a), label_b, len(dataset_b), label_c, len(dataset_c)))
+
+    # For each group in C, we calculate the conditional probabilities for A and B with given conditions
+    for condition_c in conditions_for_c:
+
+        print("\nFilter group {} == {}".format(label_c, condition_c))
+
+        # Get first the filter for the dataset c with condition_c to filter all other datasets beforehand
+        filter_c = dataset_c[:] == condition_c
+
+        # Filter datasets a and b to only have the data of the given data range
+        dataset_a_f = dataset_a[filter_c]
+        dataset_b_f = dataset_b[filter_c]
+
+        # Calculate the conditional probabilities
+        probabilities = np.append(probabilities, np.array([conditional_probabilities(dataset_a_f, dataset_b_f, conditions_for_b, conditions_for_a=conditions_for_a, label_a=label_a, label_b=label_b)]))
+
+
+    probabilities = probabilities.reshape((int(len(probabilities)/len(conditions_for_b)),int(len(conditions_for_b))))
+    print(probabilities)
+    return probabilities
+
 
 def task1d():
 
@@ -185,26 +242,88 @@ def task1d():
     Results:''')
 
     # – Pˆ(diseaseX | vacX = 0/1)
-    conditional_probabilities(diseaseX, vacX, [0,1], label_a='diseaseX', label_b='vacX')
+    global probab_diseaseX_vacX
+    probab_diseaseX_vacX = conditional_probabilities(diseaseX, vacX, [0,1], label_a='diseaseX', label_b='vacX')
 
     # – Pˆ(vacX | diseaseX = 0/1)
     conditional_probabilities(vacX, diseaseX, [0,1], label_a='vacX', label_b='diseaseX')
 
     # – Pˆ(diseaseY | age = 1/2/3/4)
+    global probab_diseaseY_age
     probab_diseaseY_age = conditional_probabilities(diseaseY, age, [1,2,3,4], label_a='diseaseY', label_b='age')
-    plotter.lines(probab_diseaseY_age, title="Probability: Had diseaseY on ages [1,2,3,4]", filename="1d_diseaseY_age")
+    plotter.lines(probab_diseaseY_age, title="Probability: Had diseaseY on ages [1,2,3,4]", filename="1d_diseaseY_age", show=False, x_ticks=["0 - 2y", "3 - 6y", "7 - 10y", "11 - 13y"])
 
     # – Pˆ(vacX | age = 1/2/3/4)
+    global probab_vacX_age
     probab_vacX_age = conditional_probabilities(vacX, age, [1,2,3,4], label_a='vacX', label_b='age')
-    plotter.lines(probab_vacX_age, title="Probability: Is vaccined against diseaseX on ages [1,2,3,4]", filename="1d_vacX_age")
+    plotter.lines(probab_vacX_age, title="Probability: Is vaccined against diseaseX on ages [1,2,3,4]", filename="1d_vacX_age", show=False, x_ticks=["0 - 2y", "3 - 6y", "7 - 10y", "11 - 13y"])
 
     # – Pˆ(knowsToRideABike | vacX = 0/1)
     conditional_probabilities(knowsToRideABike, vacX, [0,1], label_a='knowsToRideABike', label_b='vacX')
 
 ### E
+def task1e():
+
+    print('''
+
+    ------------------------------------
+    Task 1.E
+    ------------------------------------
+    GOAL: Calculate Pˆ(diseaseY Z | vacX = 0/1) and compare it to Pˆ(diseaseX|vacX = 0/1). 
+          What do you conclude from these results? 
+    
+          Now, condition additionally on age and calculate Pˆ(diseaseY Z | vacX = 0/1, age = 1/2/3/4).
+          How sure are you that your estimates for P (diseaseY Z | vacX = 0/1, age = 1/2/3/4) are accurate? 
+          What does this depend on?
+
+          Plot Pˆ(diseaseY Z = 1 | vacX = 0, age = 1/2/3/4) and Pˆ(diseaseY Z = 1 | vacX = 1, age = 1/2/3/4) as two lines in one figure with age on the x-axis and the probability on the y-axis.
+          What do you conclude from your plot?
+
+    Results:
+    ''')
+
+    # Calculate Pˆ(diseaseY Z | vacX = 0/1) and compare it to Pˆ(diseaseX|vacX = 0/1). 
+    # What do you conclude from these results?
+    global probab_diseaseYZ_vacX
+    probab_diseaseYZ_vacX = conditional_probabilities(diseaseYZ, vacX, [0,1], label_a='diseaseYZ', label_b='vacX')
+    print("\n                          vacX == 0    vacX == 1\ndiseaseYZ & vacX probab: {}\ndiseaseX & vacX probab:  {}".format(probab_diseaseYZ_vacX, probab_diseaseX_vacX))
+    plotter.lines(probab_diseaseYZ_vacX, savefig=False, show=False, stackableplot=True, label="diseaseYZ & vacX")
+    plotter.lines(probab_diseaseX_vacX, title="Conditional probability of: got disease Y OR Z and is vaccined against disease X\nvs. got disease X and is vaccined against disease X", filename="1e_diseaseYZ_diseaseX_vacX_comparison", label="diseaseX & vacX", clear=False, show=False)
+
+    print("Result: the probability for diseaseYZ and diseaseX in combination with vacX is exactly the same: both groups have a lower probability to get sick with diseases Y or Z or only X given the fact that there are vaccined against diseaseX.")
+
+    # Now, condition additionally on age and calculate Pˆ(diseaseYZ | vacX = 0/1, age = 1/2/3/4).
+    probab_diseaseYZ_vacX_age = conditional_probabilities_threefolded(diseaseYZ, vacX, age, [0,1], [1,2,3,4], label_a="diseaseYZ", label_b="vacX", label_c="age")
+    
+    # How sure are you that your estimates for P (diseaseYZ | vacX = 0/1, age = 1/2/3/4) are accurate? 
+    print('''
+    Q: How sure are you that your estimates for P (diseaseYZ | vacX = 0/1, age = 1/2/3/4) are accurate? 
+       What does this depend on?
+    A: We assume that the data is interpretable because we assumed that the age groups 1/2/3/4 are distinguished from each other. So we don't have any dataset which is multiple times used for calculations. ''')
+
+    # Plot Pˆ(diseaseY Z = 1 | vacX = 0, age = 1/2/3/4) and Pˆ(diseaseY Z = 1 | vacX = 1, age = 1/2/3/4) as two lines in one figure with age on the x-axis and the probability on the y-axis. 
+    probab_diseaseYZ1_vacX0_age = conditional_probabilities_threefolded(diseaseYZ, vacX, age, [0], [1,2,3,4], label_a="diseaseYZ", label_b="vacX", label_c="age")
+    probab_diseaseYZ1_vacX1_age = conditional_probabilities_threefolded(diseaseYZ, vacX, age, [1], [1,2,3,4], label_a="diseaseYZ", label_b="vacX", label_c="age")
+
+    probab_diseaseYZ1_vacX0_age = probab_diseaseYZ1_vacX0_age.flatten()
+    probab_diseaseYZ1_vacX1_age = probab_diseaseYZ1_vacX1_age.flatten()
+
+    print("Probability results, summarized for disease Y or Z, given vaccined == [0,1] against disease X in age groups [1,2,3,4]:\nvacX == 0: {}\nvacX == 1: {}".format(probab_diseaseYZ1_vacX0_age, probab_diseaseYZ1_vacX1_age))
+
+    plotter.lines(probab_diseaseYZ1_vacX0_age, savefig=False, show=False, stackableplot=True, label="diseaseYZ = 1 & vacX = 0", x_ticks=[1,2,3,4])
+    plotter.lines(probab_diseaseYZ1_vacX1_age, title="Conditional probability of:\ngot disease YZ, is / is not vaccined against vacX and in age of [1,2,3,4]", xlabel="age", ylabel="probability", savefig=True, filename="1e_diseaseYZ_diseaseX_vacX_age_comparison", label="diseaseYZ = 1 & vacX = 1", clear=False, show=True, x_ticks=["0 - 2y", "3 - 6y", "7 - 10y", "11 - 13y"], legend=True)
+
+    # What do you conclude from your plot?
+    print('''
+    Q: What do you conclude from your plot?
+    A: The probability of getting disease Y or Z with vaccination against disease X is dramatically low and constant over all age groups. Also, the risk of getting one of both diseases increases by the age.
+    ''')
+
 
 if __name__ == "__main__":
+    
     task1a()
     task1b()
     task1c()
     task1d()
+    task1e()
