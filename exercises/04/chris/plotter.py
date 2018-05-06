@@ -35,6 +35,8 @@ def plotfinisher(title="", xlabel="", ylabel="", savefig=True, figpath=default_d
     if savefig: 
         check_dir(figpath)
         plt.savefig(figpath + '/' + filename + format, bbox_inches='tight')
+    if legend:
+        plt.legend()
     if show:
         plt.show()
 
@@ -77,14 +79,23 @@ def bool_bars(data, x_ticks=["No", "Yes"], title="", xlabel="", ylabel="", label
 
     bars(data=data, x_ticks=x_ticks, title=title, xlabel=xlabel, ylabel=ylabel, label=label, savefig=savefig, figpath=figpath, filename=filename, format=format, grid=grid, legend=legend, clear=clear, show=show, normalize=normalize, color=color, stackableplot=stackableplot)
 
+def rearrange_x_ticks(x_ticks):
+
+    x_ticks_i = [i for i in range(0, len(x_ticks))]
+    plt.xticks(x_ticks_i, x_ticks)
+    return x_ticks_i
 
 # Lines
-def lines(data, title="", xlabel="", ylabel="", label="Lines", bins=None, savefig=True, figpath=default_dir, filename="lines_plot", format=default_format, grid=True, legend=True, clear=True, show=True, normalize=True, color=default_color, stackableplot=False):
+def lines(data, title="", xlabel="", ylabel="", label="Lines", x_ticks=None, bins=None, savefig=True, figpath=default_dir, filename="lines_plot", format=default_format, grid=True, legend=True, clear=True, show=True, normalize=True, color=default_color, stackableplot=False):
 
     if clear:
         plt.gcf().clear()
 
-    plt.plot(data, label=label)
+    if x_ticks is not None:
+        x_ticks_i = rearrange_x_ticks(x_ticks)
+        plt.plot(x_ticks_i, data, label=label)
+    else:
+        plt.plot(data, label=label)
     
     if not stackableplot:
         plotfinisher(title=title, xlabel=xlabel, ylabel=ylabel, savefig=savefig, figpath=figpath, filename=filename, format=format, grid=grid, legend=legend, show=show)
