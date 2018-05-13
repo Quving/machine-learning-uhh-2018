@@ -59,17 +59,13 @@ def task5_1():
 
     print('\n')
 
-    # Estimate w_setosa, w_versicolor and w_virginica based on training data
-    w_setosa = np.average(species_setosa)
-    w_versicolor = np.average(species_versicolor)
-    w_virginica = np.average(species_virginica)
-
-    print('-- Weight estimations for species:')
-    print("- setosa: {}\n- versicolor: {}\n- virginica: {}".format(w_setosa, w_versicolor, w_virginica))
-
     lm = LinearRegression(normalize=True, n_jobs=cpu_mode)
 
     lm.fit(train_data, train_label)
+    train_score = lm.score(train_data, train_label)
+    test_score = lm.score(test_data, test_label)
+
+    return ('lm: {}\ntrain score: {}\ntest score: {}'.format(lm, train_score, test_score))
 
 
 if __name__ == "__main__":
