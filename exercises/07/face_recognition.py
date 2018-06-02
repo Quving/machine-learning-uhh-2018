@@ -30,7 +30,7 @@ from __future__ import print_function
 from time import time
 import logging
 import matplotlib.pyplot as plt
-
+import numpy as np
 from sklearn.cross_validation import train_test_split
 from sklearn.datasets import fetch_lfw_people
 from sklearn.grid_search import GridSearchCV
@@ -87,10 +87,15 @@ print("Extracting the top %d eigenfaces from %d faces"
       % (n_components, X_train.shape[0]))
 t0 = time()
 pca = RandomizedPCA(n_components=n_components, whiten=True).fit(X_train)
+
+cov_matrix = np.dot(X.T, X) / n_samples
+for eigenvector in pca.components_:
+    print(np.dot(eigenvector.T, np.dot(cov_matrix, eigenvector)))
+
 print("done in %0.3fs" % (time() - t0))
 
 eigenfaces = pca.components_.reshape((n_components, h, w))
-
+print(eigenfaces)
 print("Projecting the input data on the eigenfaces orthonormal basis")
 t0 = time()
 X_train_pca = pca.transform(X_train)
@@ -148,7 +153,6 @@ def title(y_pred, y_test, target_names, i):
 
 prediction_titles = [title(y_pred, y_test, target_names, i)
                      for i in range(y_pred.shape[0])]
-
 plot_gallery(X_test, prediction_titles, h, w)
 
 # plot the gallery of the most significative eigenfaces
@@ -156,4 +160,4 @@ plot_gallery(X_test, prediction_titles, h, w)
 eigenface_titles = ["eigenface %d" % i for i in range(eigenfaces.shape[0])]
 plot_gallery(eigenfaces, eigenface_titles, h, w)
 
-plt.show()
+# plt.show()
