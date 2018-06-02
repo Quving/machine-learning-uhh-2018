@@ -42,7 +42,7 @@ from sklearn.svm import SVC
 
 #print(__doc__)
 
-def recognize_faces(n_components=150, min_faces_per_person=70, svm_c=[1e3, 5e3, 1e4, 5e4, 1e5], svm_gamma=[0.0001, 0.0005, 0.001, 0.005, 0.01, 0.1], resize=0.4,show_face_gallery=False):
+def recognize_faces(n_components=150, min_faces_per_person=70, svm_c=[1e3, 5e3, 1e4, 5e4, 1e5], svm_gamma=[0.0001, 0.0005, 0.001, 0.005, 0.01, 0.1], resize=0.4, plot_eigenvalues_as_histogram=True, show_face_gallery=False):
 
     # Display progress logs on stdout
     logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
@@ -93,6 +93,8 @@ def recognize_faces(n_components=150, min_faces_per_person=70, svm_c=[1e3, 5e3, 
     for eigenvector in pca.components_:
         print(np.dot(eigenvector.T, np.dot(cov_matrix, eigenvector)))
 
+    if plot_eigenvalues_as_histogram:
+        plot_eigenvalues_as_histogram(pca=pca)
     print("done in %0.3fs" % (time() - t0))
 
     eigenfaces = pca.components_.reshape((n_components, h, w))
@@ -162,6 +164,17 @@ def title(y_pred, y_test, target_names, i):
     pred_name = target_names[y_pred[i]].rsplit(' ', 1)[-1]
     true_name = target_names[y_test[i]].rsplit(' ', 1)[-1]
     return 'predicted: %s\ntrue:      %s' % (pred_name, true_name)
+
+def plot_eigenvalues_as_histogram(pca):
+    cov_matrix = np.dot(X.T, X) / n_samples
+    eigenvalues = list()
+    for eigenvector in pca.components_:
+        eigenvalues.append(np.dot(eigenvector.T, np.dot(cov_matrix, eigenvector)))
+    print("%d eigenvalues have been computed" % len(eigenvalues))
+
+    # Create histograms.
+    plt.hist(eigenvalues, bins=20)
+    plt.show()
 
 # plt.show()
 
