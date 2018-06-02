@@ -32,10 +32,46 @@ def plot_eigenvalues_hist(n_components=150, bins=20):
     print("%d eigenvalues have been computed" % len(eigenvalues))
 
     # Create histograms.
-    plt.hist(eigenvalues, bins=bins, density=True)
+    hist, bins_ = np.histogram(eigenvalues)
+
+    # Scale Y values 
+    freq = hist / n_components
+
+    print(freq)
+
+    # Plot histogram
+    plt.bar(bins_[:-1], freq)
+    plt.xlabel("Number of eigenvalues")
+    plt.ylabel("Eigenvalues")
     plt.title("Histogram of " +str(len(eigenvalues)) + " Eigenvalues")
+    plt.grid(True)
     plt.show()
 
+    return freq[0]
+
+def rearrange_x_ticks(x_ticks):
+
+    x_ticks_i = [i for i in range(0, len(x_ticks))]
+    plt.xticks(x_ticks_i, x_ticks)
+    return x_ticks_i
 
 if __name__ == "__main__":
-    pca = plot_eigenvalues_hist(n_components=500, bins=500)
+
+    ncs = [1, 3, 5, 10, 25, 50, 250, 300, 400]    
+
+    p_variances = np.array([])
+
+    for nc in ncs:
+        pca = plot_eigenvalues_hist(n_components=nc, bins=20)
+
+        p_variances = np.append(p_variances, pca)
+
+
+    x_ticks = rearrange_x_ticks(ncs)
+
+    plt.plot(x_ticks, p_variances, 'g.-')
+    plt.title("data variances of the first eigenvector")
+    plt.xlabel("Number of components")
+    plt.ylabel("% of data variances of the first eigenvector")
+    plt.grid(True)
+    plt.show()
