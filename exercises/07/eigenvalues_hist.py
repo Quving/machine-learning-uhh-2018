@@ -9,7 +9,7 @@ from sklearn.datasets import fetch_lfw_people
 from sklearn.decomposition import RandomizedPCA
 
 
-def plot_eigenvalues_hist(n_components=150):
+def plot_eigenvalues_hist(n_components=150, bins=20):
     logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
     lfw_people = fetch_lfw_people(min_faces_per_person=70, resize=0.4)
     n_samples, h, w = lfw_people.images.shape
@@ -32,10 +32,10 @@ def plot_eigenvalues_hist(n_components=150):
     print("%d eigenvalues have been computed" % len(eigenvalues))
 
     # Create histograms.
-    plt.hist(eigenvalues, bins=20)
+    plt.hist(eigenvalues, bins=bins, density=True)
     plt.title("Histogram of " +str(len(eigenvalues)) + " Eigenvalues")
     plt.show()
 
 
 if __name__ == "__main__":
-    pca = plot_eigenvalues_hist(n_components=150)
+    pca = plot_eigenvalues_hist(n_components=500, bins=500)
