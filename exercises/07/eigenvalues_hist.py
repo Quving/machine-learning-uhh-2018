@@ -33,6 +33,7 @@ def plot_eigenvalues_hist(n_components=150):
 
     # Create histograms.
     plt.hist(eigenvalues, bins=20)
+    plt.title("Histogram of " +str(len(eigenvalues)) + " Eigenvalues")
     plt.show()
 
 
