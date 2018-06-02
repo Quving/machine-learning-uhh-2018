@@ -9,20 +9,17 @@ from sklearn.datasets import fetch_lfw_people
 from sklearn.decomposition import RandomizedPCA
 
 
-def plot_eigenvalues_hist():
+def plot_eigenvalues_hist(n_components=150):
     logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
     lfw_people = fetch_lfw_people(min_faces_per_person=70, resize=0.4)
     n_samples, h, w = lfw_people.images.shape
     X = lfw_people.data
-    n_features = X.shape[1]
     y = lfw_people.target
     target_names = lfw_people.target_names
-    n_classes = target_names.shape[0]
 
     # split into a training and testing set
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.25)
-    n_components = 150
     t0 = time()
     pca = RandomizedPCA(n_components=n_components, whiten=True).fit(X_train)
 
@@ -40,4 +37,4 @@ def plot_eigenvalues_hist():
 
 
 if __name__ == "__main__":
-    pca = plot_eigenvalues_hist()
+    pca = plot_eigenvalues_hist(n_components=150)
