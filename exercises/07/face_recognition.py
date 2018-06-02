@@ -39,7 +39,16 @@ from sklearn.metrics import confusion_matrix
 from sklearn.decomposition import RandomizedPCA
 from sklearn.svm import SVC
 
+def plot_eigenvalues_as_histogram(pca):
+    cov_matrix = np.dot(X.T, X) / n_samples
+    eigenvalues = list()
+    for eigenvector in pca.components_:
+        eigenvalues.append(np.dot(eigenvector.T, np.dot(cov_matrix, eigenvector)))
+    print("%d eigenvalues have been computed" % len(eigenvalues))
 
+    # Create histograms.
+    plt.hist(eigenvalues, bins=20)
+    plt.show()
 print(__doc__)
 
 # Display progress logs on stdout
@@ -88,14 +97,10 @@ print("Extracting the top %d eigenfaces from %d faces"
 t0 = time()
 pca = RandomizedPCA(n_components=n_components, whiten=True).fit(X_train)
 
-cov_matrix = np.dot(X.T, X) / n_samples
-for eigenvector in pca.components_:
-    print(np.dot(eigenvector.T, np.dot(cov_matrix, eigenvector)))
-
+plot_eigenvalues_as_histogram(pca=pca)
 print("done in %0.3fs" % (time() - t0))
 
 eigenfaces = pca.components_.reshape((n_components, h, w))
-print(eigenfaces)
 print("Projecting the input data on the eigenfaces orthonormal basis")
 t0 = time()
 X_train_pca = pca.transform(X_train)
