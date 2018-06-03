@@ -48,7 +48,7 @@ def face_recognition(n_components = 150):
     print("done in %0.3fs" % (time() - t0))
     return {"report": report,
             "confusion_matrix": confusion_mat,
-            "nc_components": n_components}
+            "n_components": n_components}
 
 def plot_gallery(images, titles, h, w, n_row=3, n_col=4):
     plt.figure(figsize=(1.8 * n_col, 2.4 * n_row))
@@ -67,10 +67,13 @@ def title(y_pred, y_test, target_names, i):
     true_name = target_names[y_test[i]].rsplit(' ', 1)[-1]
     return 'predicted: %s\ntrue:      %s' % (pred_name, true_name)
 
+
 if __name__ == "__main__":
     result = list()
     for n in [50, 100, 150, 200]:
         result.append(face_recognition(n_components=n))
 
     for res in result:
-        print(res)
+        print("N_component", res["n_components"])
+        print("\t", res["report"])
+
