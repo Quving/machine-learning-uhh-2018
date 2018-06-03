@@ -52,7 +52,7 @@ def face_recognition(n_components,results):
             "n_components": n_components,
             "mse": mse}
 
-    results.append(result)
+    results[n_components] = result
 
 def plot_gallery(images, titles, h, w, n_row=3, n_col=4):
     plt.figure(figsize=(1.8 * n_col, 2.4 * n_row))
@@ -73,10 +73,10 @@ def title(y_pred, y_test, target_names, i):
 
 
 if __name__ == "__main__":
-    results = list()
+    results = dict()
     threads = list()
 
-    for n in np.arange(25,50,25):
+    for n in np.arange(25,500,25):
         thread = Thread(target=face_recognition, args=(n, results))
         thread.start()
         threads.append(thread)
@@ -84,9 +84,8 @@ if __name__ == "__main__":
     for thread in threads:
         thread.join()
 
-    for res in results:
+    for key,value in results.items():
         print("================================")
-        print("N_component", res["n_components"])
-        print("loss:", res["mse"])
-        #print(res["report"])
+        print("N_component", value["n_components"])
+        print("loss:", value["mse"])
 
