@@ -181,7 +181,7 @@ def rearrange_x_ticks(x_ticks):
 if __name__ == "__main__":
 
     ncs = [1,3,5,10,15,20,30,50,100,150,200,250,300]
-    # ncs = [1,3,5,10,15,20]
+    #ncs = [1,3]
 
     losses = np.array([])
     r2_scores = np.array([])
@@ -200,8 +200,9 @@ if __name__ == "__main__":
     print('Losses: {}'.format(losses))
 
     plt.grid(True)
-    plt.plot(x_ticks, r2_score, 'g.-')
-    plt.title("R^2 per number of components")
+    plt.plot(x_ticks, r2_scores, 'g.-', label="R^2")
+    plt.plot(x_ticks, losses, 'r^-', label="Losses")
+    plt.legend()
+    plt.title("R^2 and losses per number of components")
     plt.xlabel("Number of components")
-    plt.ylabel("R^2")
     plt.show()
