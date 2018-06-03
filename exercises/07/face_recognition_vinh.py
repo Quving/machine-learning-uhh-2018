@@ -6,6 +6,7 @@ from threading import Thread
 import numpy as np
 import logging
 import matplotlib.pyplot as plt
+from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.datasets import fetch_lfw_people
 from sklearn.metrics import classification_report
@@ -14,12 +15,10 @@ from sklearn.decomposition import RandomizedPCA
 from sklearn.svm import SVC
 
 
-print(__doc__)
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
 
 
 def face_recognition(n_components,results):
-    print("Bla")
     t0 = time()
     lfw_people = fetch_lfw_people(min_faces_per_person=70, resize=0.4)
     n_samples, h, w = lfw_people.images.shape
@@ -47,9 +46,12 @@ def face_recognition(n_components,results):
     confusion_mat = confusion_matrix(y_test, y_pred, labels=range(n_classes))
 
     print("done in %0.3fs" % (time() - t0))
+    mse = mean_squared_error(y_test, y_pred), r2_score(y_test,y_pred)
     result =  {"report": report,
             "confusion_matrix": confusion_mat,
-            "n_components": n_components}
+            "n_components": n_components,
+            "mse": mse}
+
     results.append(result)
 
 def plot_gallery(images, titles, h, w, n_row=3, n_col=4):
@@ -73,8 +75,8 @@ def title(y_pred, y_test, target_names, i):
 if __name__ == "__main__":
     results = list()
     threads = list()
-    
-    for n in np.arange(25,500,25):
+
+    for n in np.arange(25,50,25):
         thread = Thread(target=face_recognition, args=(n, results))
         thread.start()
         threads.append(thread)
@@ -85,5 +87,6 @@ if __name__ == "__main__":
     for res in results:
         print("================================")
         print("N_component", res["n_components"])
-        print(res["report"])
+        print("loss:", res["mse"])
+        #print(res["report"])
 
