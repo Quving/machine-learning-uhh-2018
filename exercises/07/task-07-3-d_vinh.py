@@ -70,21 +70,14 @@ def plot_gallery(images, titles, h, w, n_row=3, n_col=4):
         plt.yticks(())
 
 
-# plot the result of the prediction on a portion of the test set
-def title(y_pred, y_test, target_names, i):
-    pred_name = target_names[y_pred[i]].rsplit(' ', 1)[-1]
-    true_name = target_names[y_test[i]].rsplit(' ', 1)[-1]
-    return 'predicted: %s\ntrue:      %s' % (pred_name, true_name)
-
-
 if __name__ == "__main__":
     results = dict()
     threads = list()
 
-    for n in np.arange(25,600,10):
+    for n in np.arange(25,40,10):
         thread = Thread(target=face_recognition, args=(n, results))
-        thread.start()
         threads.append(thread)
+        thread.start()
 
     for thread in threads:
         thread.join()
@@ -103,4 +96,4 @@ if __name__ == "__main__":
     plt.plot(x_axes, r2_score_y, label="R2_Score")
     leg = plt.legend(loc='upper right', ncol=1, mode="None", shadow=True, fancybox=True)
     leg.get_frame().set_alpha(0.5)
-    plt.savefig('mse_r2_score.png')
+    plt.savefig('task-07-3-d_plot.png')
