@@ -37,10 +37,8 @@ def face_recognition(n_components = 150):
                   'gamma': [0.0001, 0.0005, 0.001, 0.005, 0.01, 0.1], }
     clf = GridSearchCV(SVC(kernel='rbf', class_weight='balanced'), param_grid)
     clf = clf.fit(X_train_pca, y_train)
-    print("done in %0.3fs" % (time() - t0))
 
     y_pred = clf.predict(X_test_pca)
-    print("done in %0.3fs" % (time() - t0))
 
     report = classification_report(y_test, y_pred, target_names=target_names)
     confusion_mat = confusion_matrix(y_test, y_pred, labels=range(n_classes))
