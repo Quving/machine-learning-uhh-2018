@@ -25,10 +25,8 @@ def plot_eigenvalues_hist(n_components=150, bins=20):
     print("done in %0.3fs" % (time() - t0))
 
     cov_matrix = np.dot(X.T, X) / n_samples
-    eigenvalues = list()
-    for eigenvector in pca.components_:
-        eigenvalues.append(np.dot(eigenvector.T, np.dot(cov_matrix, eigenvector)))
-    print("%d eigenvalues have been computed" % len(eigenvalues))
+    
+    eigenvalues = pca.explained_variance_
 
     # Create histograms.
     hist, bins_ = np.histogram(eigenvalues)
@@ -38,8 +36,10 @@ def plot_eigenvalues_hist(n_components=150, bins=20):
 
     print(freq)
 
+    x_ticks = rearrange_x_ticks(bins_[:-1])
+
     # Plot histogram
-    plt.bar(bins_[:-1], freq)
+    plt.bar(x_ticks, freq)
     plt.xlabel("Number of eigenvalues")
     plt.ylabel("Eigenvalues")
     plt.title("Histogram of " +str(len(eigenvalues)) + " Eigenvalues")
