@@ -190,10 +190,10 @@ if __name__ == "__main__":
         print('------------------------------------------------')
         print('Starting recognition progress for nc={} ({} of {})'.format(nc, nc_i+1, len(ncs)))
 
-        loss, r2_score = recognize_faces(n_components=nc)
+        loss, r2_s = recognize_faces(n_components=nc)
 
         losses = np.append(losses, loss)
-        r2_scores = np.append(r2_scores, r2_score)
+        r2_scores = np.append(r2_scores, r2_s)
     
     x_ticks = rearrange_x_ticks(ncs)
 
