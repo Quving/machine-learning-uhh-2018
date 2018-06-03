@@ -74,7 +74,7 @@ if __name__ == "__main__":
     results = dict()
     threads = list()
 
-    for n in np.arange(25,40,10):
+    for n in np.arange(25,1000,10):
         thread = Thread(target=face_recognition, args=(n, results))
         threads.append(thread)
         thread.start()
