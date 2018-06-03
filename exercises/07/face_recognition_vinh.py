@@ -96,8 +96,8 @@ if __name__ == "__main__":
         r2_score_y.append(value["r2_score"])
 
     # Plot mse and r2
-    plt.title("MSE and R2_score by increasing n_components.")
     plt.gcf().clear()
+    plt.title("MSE and R2_score by increasing n_components.")
     plt.grid(True)
     plt.plot(x_axes, loss_y, label="MSE")
     plt.plot(x_axes, r2_score_y, label="R2_Score")
