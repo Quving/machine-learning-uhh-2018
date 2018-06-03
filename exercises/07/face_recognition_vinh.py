@@ -6,6 +6,8 @@ from threading import Thread
 import numpy as np
 import logging
 import operator
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split, GridSearchCV
@@ -14,7 +16,6 @@ from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
 from sklearn.decomposition import PCA
 from sklearn.svm import SVC
-
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
 
@@ -93,11 +94,12 @@ if __name__ == "__main__":
         x_axes.append(key)
         loss_y.append(value["mse"])
         r2_score_y.append(value["r2_score"])
-    print(x_axes)
+
+    # Plot mse and r2
     plt.title("MSE and R2_score by increasing n_components.")
     plt.gcf().clear()
-    plt.plot(x_axes, loss_y, label="MSE-Error")
-    plt.plot(x_axes, r2_score_y, label="R2_score")
+    plt.plot(x_axes, loss_y, label="MSE")
+    plt.plot(x_axes, r2_score_y, label="R2_Score")
     leg = plt.legend(loc='upper right', ncol=1, mode="None", shadow=True, fancybox=True)
     leg.get_frame().set_alpha(0.5)
     plt.savefig('mse_r2_score.png')
