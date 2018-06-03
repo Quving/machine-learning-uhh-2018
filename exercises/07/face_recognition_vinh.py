@@ -11,7 +11,7 @@ from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.datasets import fetch_lfw_people
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
-from sklearn.decomposition import RandomizedPCA
+from sklearn.decomposition import PCA
 from sklearn.svm import SVC
 
 
@@ -30,7 +30,7 @@ def face_recognition(n_components,results):
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.25)
 
-    pca = RandomizedPCA(n_components=n_components, whiten=True).fit(X_train)
+    pca = PCA(svd_solver="randomized", n_components=n_components, whiten=True).fit(X_train)
 
     X_train_pca = pca.transform(X_train)
     X_test_pca = pca.transform(X_test)
@@ -45,7 +45,6 @@ def face_recognition(n_components,results):
     report = classification_report(y_test, y_pred, target_names=target_names)
     confusion_mat = confusion_matrix(y_test, y_pred, labels=range(n_classes))
 
-    print("done in %0.3fs" % (time() - t0))
     mse = mean_squared_error(y_test, y_pred), r2_score(y_test,y_pred)
     result =  {"report": report,
             "confusion_matrix": confusion_mat,
@@ -53,6 +52,8 @@ def face_recognition(n_components,results):
             "mse": mse}
 
     results[n_components] = result
+    print("Computation for n_components:", n_components, "done in %0.3fs" % (time() - t0))
+    
 
 def plot_gallery(images, titles, h, w, n_row=3, n_col=4):
     plt.figure(figsize=(1.8 * n_col, 2.4 * n_row))
