@@ -35,6 +35,8 @@ from sklearn.cross_validation import train_test_split
 from sklearn.datasets import fetch_lfw_people
 from sklearn.grid_search import GridSearchCV
 from sklearn.metrics import classification_report
+from sklearn.metrics import mean_squared_error
+from sklearn.metrics import r2_score
 from sklearn.metrics import confusion_matrix
 from sklearn.decomposition import RandomizedPCA
 from sklearn.svm import SVC
@@ -124,10 +126,15 @@ def recognize_faces(n_components=150, min_faces_per_person=70, svm_c=[1e3, 5e3, 
     print("Predicting people's names on the test set")
     t0 = time()
     y_pred = clf.predict(X_test_pca)
-    print("done in %0.3fs" % (time() - t0))
+    end_time = time() - t0
+    print("done in {}s".format(end_time))
 
     print(classification_report(y_test, y_pred, target_names=target_names))
     print(confusion_matrix(y_test, y_pred, labels=range(n_classes)))
+
+    # Return errors
+    return mean_squared_error(y_test, y_pred, multioutput='uniform_average'), r2_score(y_test,y_pred)
+
 
     if show_face_gallery:
         prediction_titles = [title(y_pred, y_test, target_names, i)
@@ -165,5 +172,36 @@ def title(y_pred, y_test, target_names, i):
 
 # plt.show()
 
+def rearrange_x_ticks(x_ticks):
+
+    x_ticks_i = [i for i in range(0, len(x_ticks))]
+    plt.xticks(x_ticks_i, x_ticks)
+    return x_ticks_i
+
 if __name__ == "__main__":
-    recognize_faces()
+
+    ncs = [1,3,5,10,15,20,30,50,100,150,200,250,300]
+    # ncs = [1,3,5,10,15,20]
+
+    losses = np.array([])
+    r2_scores = np.array([])
+    for nc, nc_i in zip(ncs, np.arange(len(ncs))):
+
+        print('------------------------------------------------')
+        print('Starting recognition progress for nc={} ({} of {})'.format(nc, nc_i+1, len(ncs)))
+
+        loss, r2_score = recognize_faces(n_components=nc)
+
+        losses = np.append(losses, loss)
+        r2_scores = np.append(r2_scores, r2_score)
+    
+    x_ticks = rearrange_x_ticks(ncs)
+
+    print('Losses: {}'.format(losses))
+
+    plt.grid(True)
+    plt.plot(x_ticks, r2_score, 'g.-')
+    plt.title("R^2 per number of components")
+    plt.xlabel("Number of components")
+    plt.ylabel("R^2")
+    plt.show()
