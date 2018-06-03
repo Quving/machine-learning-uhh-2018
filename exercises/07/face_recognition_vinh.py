@@ -67,5 +67,10 @@ def title(y_pred, y_test, target_names, i):
     true_name = target_names[y_test[i]].rsplit(' ', 1)[-1]
     return 'predicted: %s\ntrue:      %s' % (pred_name, true_name)
 
+if __name__ == "__main__":
+    result = list()
+    for n in [50, 100, 150, 200]:
+        result.append(face_recognition(n_components=n))
 
-print(face_recognition(n_components=150))
+    for res in result:
+        print(res)
