@@ -81,7 +81,7 @@ if __name__ == "__main__":
     results = dict()
     threads = list()
 
-    for n in np.arange(25,525,25):
+    for n in np.arange(25,600,10):
         thread = Thread(target=face_recognition, args=(n, results))
         thread.start()
         threads.append(thread)
@@ -98,6 +98,7 @@ if __name__ == "__main__":
     # Plot mse and r2
     plt.title("MSE and R2_score by increasing n_components.")
     plt.gcf().clear()
+    plt.grid(True)
     plt.plot(x_axes, loss_y, label="MSE")
     plt.plot(x_axes, r2_score_y, label="R2_Score")
     leg = plt.legend(loc='upper right', ncol=1, mode="None", shadow=True, fancybox=True)
