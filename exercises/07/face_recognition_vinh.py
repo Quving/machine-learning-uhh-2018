@@ -5,6 +5,7 @@ from time import time
 from threading import Thread
 import numpy as np
 import logging
+import operator
 import matplotlib.pyplot as plt
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split, GridSearchCV
@@ -20,6 +21,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s')
 
 def face_recognition(n_components,results):
     t0 = time()
+    print("Start computing", n_components, "n_compoments.")
     lfw_people = fetch_lfw_people(min_faces_per_person=70, resize=0.4)
     n_samples, h, w = lfw_people.images.shape
     X = lfw_people.data
@@ -45,15 +47,16 @@ def face_recognition(n_components,results):
     report = classification_report(y_test, y_pred, target_names=target_names)
     confusion_mat = confusion_matrix(y_test, y_pred, labels=range(n_classes))
 
-    mse = mean_squared_error(y_test, y_pred), r2_score(y_test,y_pred)
+    mse_r2_score = mean_squared_error(y_test, y_pred), r2_score(y_test,y_pred)
     result =  {"report": report,
             "confusion_matrix": confusion_mat,
             "n_components": n_components,
-            "mse": mse}
+            "mse": mse_r2_score[0],
+            "r2_score": mse_r2_score[1]}
 
     results[n_components] = result
-    print("Computation for n_components:", n_components, "done in %0.3fs" % (time() - t0))
-    
+    print("Finished computing for", n_components,"n_components:", n_components, "done in %0.3fs" % (time() - t0))
+
 
 def plot_gallery(images, titles, h, w, n_row=3, n_col=4):
     plt.figure(figsize=(1.8 * n_col, 2.4 * n_row))
@@ -77,7 +80,7 @@ if __name__ == "__main__":
     results = dict()
     threads = list()
 
-    for n in np.arange(25,500,25):
+    for n in np.arange(25,525,25):
         thread = Thread(target=face_recognition, args=(n, results))
         thread.start()
         threads.append(thread)
@@ -85,8 +88,16 @@ if __name__ == "__main__":
     for thread in threads:
         thread.join()
 
-    for key,value in results.items():
-        print("================================")
-        print("N_component", value["n_components"])
-        print("loss:", value["mse"])
-
+    x_axes, loss_y, r2_score_y = list(), list(), list()
+    for key,value in sorted(results.items(), key=operator.itemgetter(0)):
+        x_axes.append(key)
+        loss_y.append(value["mse"])
+        r2_score_y.append(value["r2_score"])
+    print(x_axes)
+    plt.title("MSE and R2_score by increasing n_components.")
+    plt.gcf().clear()
+    plt.plot(x_axes, loss_y, label="MSE-Error")
+    plt.plot(x_axes, r2_score_y, label="R2_score")
+    leg = plt.legend(loc='upper right', ncol=1, mode="None", shadow=True, fancybox=True)
+    leg.get_frame().set_alpha(0.5)
+    plt.savefig('mse_r2_score.png')
