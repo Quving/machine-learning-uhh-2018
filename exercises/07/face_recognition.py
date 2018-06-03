@@ -200,9 +200,9 @@ if __name__ == "__main__":
     print('Losses: {}'.format(losses))
 
     plt.grid(True)
+    plt.title("R^2 and losses per number of components")
     plt.plot(x_ticks, r2_scores, 'g.-', label="R^2")
     plt.plot(x_ticks, losses, 'r^-', label="Losses")
     plt.legend()
-    plt.title("R^2 and losses per number of components")
     plt.xlabel("Number of components")
     plt.show()
