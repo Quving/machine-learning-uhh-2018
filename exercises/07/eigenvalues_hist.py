@@ -66,8 +66,8 @@ if __name__ == "__main__":
     x_ticks = rearrange_x_ticks(ncs)
 
     plt.plot(x_ticks, p_variances, 'g.-')
-    plt.title("data variances of the first eigenvector")
+    plt.title("data variances of the max() eigenvector")
     plt.xlabel("Number of components")
-    plt.ylabel("% of data variances of the first eigenvector")
+    plt.ylabel("% of data variances")
     plt.grid(True)
     plt.show()
