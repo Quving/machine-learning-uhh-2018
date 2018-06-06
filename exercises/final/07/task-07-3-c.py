@@ -39,12 +39,12 @@ def plot_eigenvalues_hist(n_components=150, bins=20):
     x_ticks = rearrange_x_ticks(bins_[:-1])
 
     # Plot histogram
-    plt.bar(x_ticks, freq)
-    plt.xlabel("Number of eigenvalues")
-    plt.ylabel("Eigenvalues")
-    plt.title("Histogram of " +str(len(eigenvalues)) + " Eigenvalues")
-    plt.grid(True)
-    plt.show()
+    # plt.bar(x_ticks, freq)
+    # plt.xlabel("Number of eigenvalues")
+    # plt.ylabel("Eigenvalues")
+    # plt.title("Histogram of " +str(len(eigenvalues)) + " Eigenvalues")
+    # plt.grid(True)
+    # plt.show()
     return np.amax(freq)
 
 def rearrange_x_ticks(x_ticks):
@@ -54,7 +54,7 @@ def rearrange_x_ticks(x_ticks):
 
 if __name__ == "__main__":
 
-    ncs = [1, 3, 5, 10, 25, 50, 250, 300, 400]
+    ncs = np.arange(5,500,25)
 
     p_variances = np.array([])
 
@@ -66,7 +66,7 @@ if __name__ == "__main__":
     x_ticks = rearrange_x_ticks(ncs)
 
     plt.plot(x_ticks, p_variances, 'g.-')
-    plt.title("data variances of the max() eigenvector")
+    plt.title("Data Variances of the most frequent eigenvector")
     plt.xlabel("Number of components")
     plt.ylabel("% of data variances")
     plt.grid(True)
