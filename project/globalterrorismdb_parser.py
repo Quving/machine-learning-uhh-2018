@@ -50,15 +50,15 @@ class GlobalTerrorismDBParser():
             del lg[idx - incr]
             del lat[idx - incr]
             incr += 1
-        t1 = threading.Thread(target=self.__plot_heatmap_1(lg,
-                                                           lat,
-                                                           "Geographical heatmap of terrorism attacks",
-                                                           "geo_heatmap_1.png"))
+        t1 = threading.Thread(target=self.__plot_heatmap_1, args=[lg,
+                                                                  lat,
+                                                                  "Geographical heatmap of terrorism attacks",
+                                                                  "geo_heatmap_1.png"])
 
-        t2 = threading.Thread(target=self.__plot_heatmap_1(lg,
-                                                           lat,
-                                                           "Geographical heatmap of terrorism attacks",
-                                                           "geo_heatmap_2.png"))
+        t2 = threading.Thread(target=self.__plot_heatmap_1, args=[lg,
+                                                                  lat,
+                                                                  "Geographical heatmap of terrorism attacks",
+                                                                  "geo_heatmap_2.png"])
 
         t1.start()
         t2.start()
