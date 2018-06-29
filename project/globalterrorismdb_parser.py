@@ -1,12 +1,13 @@
-import pandas as pd
-import json
-import os
-import matplotlib.pyplot as plt
-import math
-import numpy as np
 import copy
-import threading
+import json
+import math
+import os
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 from scipy.stats import gaussian_kde
+from multiprocessing import Process
 
 
 class GlobalTerrorismDBParser():
@@ -50,33 +51,32 @@ class GlobalTerrorismDBParser():
             del lg[idx - incr]
             del lat[idx - incr]
             incr += 1
-        t1 = threading.Thread(target=self.__plot_heatmap_1, args=[lg,
-                                                                  lat,
-                                                                  "Geographical heatmap of terrorism attacks",
-                                                                  "geo_heatmap_1.png"])
+        p1 = Process(target=plot_heatmap_1,
+                     args=[lg, lat, "Geographical heatmap of terrorism attacks", "geo_heatmap_1.png", self.plot_dir])
 
-        t2 = threading.Thread(target=self.__plot_heatmap_1, args=[lg,
-                                                                  lat,
-                                                                  "Geographical heatmap of terrorism attacks",
-                                                                  "geo_heatmap_2.png"])
+        p2 = Process(target=plot_heatmap_2,
+                     args=[lg, lat, "Geographical heatmap of terrorism attacks", "geo_heatmap_2.png", self.plot_dir])
+        p1.start()
+        p2.start()
 
-        t1.start()
-        t2.start()
+        p1.join()
+        p2.join()
 
-        t1.join()
-        t2.join()
 
-    def __plot_heatmap_1(self, lg, lat, title, filename):
-        plt.gcf().clear()
-        lg_lat = np.vstack([lg, lat])
-        z = gaussian_kde(lg_lat)(lg_lat)
-        plt.title(title)
-        plt.scatter(lg, lat, c=z, s=2.5, alpha=1)
-        plt.savefig(os.path.join(self.plot_dir, filename), bbox_inches='tight')
+def plot_heatmap_1(lg, lat, title, filename, plot_dir):
+    plt.gcf().clear()
+    lg_lat = np.vstack([lg, lat])
+    z = gaussian_kde(lg_lat)(lg_lat)
+    plt.title(title)
+    plt.scatter(lg, lat, c=z, s=2.5, alpha=1)
+    plt.savefig(os.path.join(plot_dir, filename), bbox_inches='tight')
+    plt.show()
 
-    def __plot_heatmap_2(self, lg, lat, title, filename):
-        plt.gcf().clear()
-        plt.hist2d(lg, lat, (100, 100), cmap=plt.cm.jet, alpha=1)
-        plt.colorbar()
-        plt.title(title)
-        plt.savefig(os.path.join(self.plot_dir, filename), bbox_inches='tight')
+
+def plot_heatmap_2(lg, lat, title, filename, plot_dir):
+    plt.gcf().clear()
+    plt.hist2d(lg, lat, (150, 150), cmap=plt.cm.jet, alpha=1)
+    plt.colorbar()
+    plt.title(title)
+    plt.savefig(os.path.join(plot_dir, filename), bbox_inches='tight')
+    plt.show()
