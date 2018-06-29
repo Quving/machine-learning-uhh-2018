@@ -25,5 +25,3 @@ class GlobalTerrorismDBParser():
                 json.dump(obj=list(self.data.get(column)), fp=f, sort_keys=True, indent=4)
 
 
-gt_parser = GlobalTerrorismDBParser()
-gt_parser.to_json()
