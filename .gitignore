@@ -109,4 +109,6 @@ scripts/
 **.png
 **.pdf
 submissions/
-.idea/
+**.idea/
+**.csv
+
