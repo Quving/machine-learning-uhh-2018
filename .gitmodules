@@ -1,3 +1,6 @@
 [submodule "exercises/05/vinh/exercises/05/vinh/libsvm"]
 	path = exercises/05/vinh/exercises/05/vinh/libsvm
 	url = https://github.com/cjlin1/libsvm.git
+[submodule "project/pyhelpers"]
+	path = project/pyhelpers
+	url = git@github.com:Quving/pyhelpers.git

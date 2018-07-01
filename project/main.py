@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 from computer import Computer
-from globalterrorismdb_parser import GlobalTerrorismDBParser
 
 if __name__ == "__main__":
     computer = Computer()
@@ -14,7 +13,7 @@ if __name__ == "__main__":
                                        info_threshold=3)
 
     # Plot geographic map
-    # gt_parser.plot_geographical_heatmap(filename="geographic_map_1.png")
+    computer.plot_geographical_heatmap(filename="geographic_map_1.png")
 
     index = [list(range(0, 10)),
              list(range(140, 150)),
