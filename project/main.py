@@ -1,16 +1,25 @@
 #!/usr/bin/env python
 
+from computer import Computer
 from globalterrorismdb_parser import GlobalTerrorismDBParser
 
 if __name__ == "__main__":
-    gt_parser = GlobalTerrorismDBParser()
+    computer = Computer()
 
     # Plot histogram for country
-    gt_parser.plot_histogram_for_column(column_name="country",
-                                        bins=100,
-                                        xlabel="Country Id",
-                                        ylabel="Frequency",
-                                        info_threshold=3)
+    computer.plot_histogram_for_column(column_name="country",
+                                       bins=100,
+                                       xlabel="Country Id",
+                                       ylabel="Frequency",
+                                       info_threshold=3)
 
     # Plot geographic map
     # gt_parser.plot_geographical_heatmap(filename="geographic_map_1.png")
+
+    index = [list(range(0, 10)),
+             list(range(140, 150)),
+             list(range(90, 100))]
+    for block in index:
+        print(block)
+        for country_id in block:
+            print("\t", computer.gt_parser.get_country_by_id(country_id))
