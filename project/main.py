@@ -6,7 +6,11 @@ if __name__ == "__main__":
     gt_parser = GlobalTerrorismDBParser()
 
     # Plot histogram for country
-    gt_parser.plot_histogram_for_column("country", bins=250, xlabel="Country Id", ylabel="Frequency")
+    gt_parser.plot_histogram_for_column(column_name="country",
+                                        bins=100,
+                                        xlabel="Country Id",
+                                        ylabel="Frequency",
+                                        info_threshold=3)
 
     # Plot geographic map
-    gt_parser.plot_geographical_heatmap(filename="geographic_map.png")
+    # gt_parser.plot_geographical_heatmap(filename="geographic_map_1.png")
