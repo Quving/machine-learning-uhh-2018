@@ -19,6 +19,28 @@ class Computer:
                      'size': 16,
                      }
 
+    def eliminate_nans(self, list1, list2):
+        """
+        Eliminate nan entries from both lists and synchronizes them.
+        :param list1:
+        :param list2:
+        :return:
+        """
+        lg = copy.deepcopy(list1)
+        lat = copy.deepcopy(list2)
+
+        idxs = list()
+        for val, (a, b) in enumerate(zip(lg, lat)):
+            if math.isnan(a) or math.isnan(b):
+                idxs.append(val)
+
+        incr = 0
+        for idx in idxs:
+            del lg[idx - incr]
+            del lat[idx - incr]
+            incr += 1
+        return (lg, lat)
+
     def plot_geographical_heatmap(self, filename):
         """
         Plots the longitude and latitude of terrorism attacks to png.
@@ -33,16 +55,7 @@ class Computer:
         lg = copy.deepcopy(self.gt_parser.get_column(column="longitude"))
         lat = copy.deepcopy(self.gt_parser.get_column(column="latitude"))
 
-        idxs = list()
-        for val, (a, b) in enumerate(zip(lg, lat)):
-            if math.isnan(a) or math.isnan(b):
-                idxs.append(val)
-
-        incr = 0
-        for idx in idxs:
-            del lg[idx - incr]
-            del lat[idx - incr]
-            incr += 1
+        lg, lat = self.eliminate_nans(lg, lat)
 
         # Plotting
         p1 = Process(target=self.plot_heatmap_1,
