@@ -27,9 +27,10 @@ class Computer:
         x = copy.deepcopy(self.gt_parser.get_column(column="longitude"))
         y = copy.deepcopy(self.gt_parser.get_column(column="latitude"))
 
-        x, y = Cleaner.eliminate_and_synchronize_nans(x, y)
+        # x, y = Cleaner.eliminate_and_synchronize_nans(x, y)
+        x = Cleaner.fill_nans(x)
+        y = Cleaner.fill_nans(y)
 
-        # Plotting
         title = "Geographical heatmap of terrorism attacks"
         xlabel = "Longitude"
         ylabel = "Latitude"
@@ -45,7 +46,33 @@ class Computer:
                                  title=title,
                                  filename=os.path.join(self.plot_dir, "scatter_" + filename),
                                  xlabel=xlabel,
-                                 ylabel=ylabel)
+                                 ylabel=ylabel,
+                                 show_plot=False)
+
+            # Extract location in respect to the attacktype of attacktype1..
+            attacktypes = self.gt_parser.get_column("attacktype1")
+            attacktypes_sorted = {}
+            for idx, (x, y) in enumerate(zip(x, y)):
+                key = str(attacktypes[idx])
+                if not key in attacktypes_sorted:
+                    attacktypes_sorted[key] = {"x": [], "y": []}
+
+                attacktypes_sorted[key]["x"].append(x)
+                attacktypes_sorted[key]["y"].append(y)
+
+            attacktypes_label = self.gt_parser.get_column("attacktype1_txt")
+            for key, value in attacktypes_sorted.items():
+                title_atk = "Plot of attacktype '" + attacktypes_label[int(key)] + "'"
+                filename_atk = os.path.join(self.plot_dir, "atk_" + key + "_" + filename)
+
+                x,y = value["x"], value["y"]
+
+                Plotter.plot_scatter(x, y,
+                                     title=title_atk,
+                                     filename=filename_atk,
+                                     xlabel=xlabel,
+                                     ylabel=ylabel,
+                                     show_plot=False)
 
     def plot_histogram_for_column(self, column_name, bins, xlabel, ylabel, info_threshold,
                                   textbox_x_positional_percentage=0.75,

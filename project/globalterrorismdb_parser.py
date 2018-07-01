@@ -14,12 +14,18 @@ class GlobalTerrorismDBParser:
         self.data_filename = "globalterrorismdb_0617dist.csv"
         self.data_path = os.path.join(self.data_dir, self.data_filename)
 
+        if not isinstance(self.data, pd.DataFrame):
+            raise ValueError("Must be instance of DataFrame, but got " + type(self.data) + ".")
+
+    def reset_jsons(self):
+        """
+        Replaces the 'column.jsons' with the original file.
+        :return:
+        """
         self.data = pd.read_csv(self.data_path,
                                 encoding="latin1",
                                 low_memory=False)
-
-        if not isinstance(self.data, pd.DataFrame):
-            raise ValueError("Must be instance of DataFrame, but got " + type(self.data) + ".")
+        self.to_json()
 
     def get_country_by_id(self, id):
         """
@@ -48,10 +54,11 @@ class GlobalTerrorismDBParser:
         :param column:
         :return:
         """
+        filename = os.path.join(self.data_dir, column + ".json")
 
-        out = self.data.get(column)
-        if out is None:
+        if not os.path.exists(filename):
             raise KeyError("'" + column + "' does not exist.")
+        with open(filename, "r") as f:
+            out = json.loads(column)
 
         return list(out)
-
