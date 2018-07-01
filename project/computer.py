@@ -1,11 +1,11 @@
 import copy
 import os
-from multiprocessing import Process
-import numpy as np
+
+from sklearn.neighbors import KNeighborsClassifier
+
 from globalterrorismdb_parser import GlobalTerrorismDBParser
 from pyhelpers.cleaner import Cleaner
 from pyhelpers.plotter import Plotter
-from sklearn.neighbors import KNeighborsClassifier
 
 
 class Computer:
@@ -27,7 +27,7 @@ class Computer:
         x = copy.deepcopy(self.gt_parser.get_column(column="longitude"))
         y = copy.deepcopy(self.gt_parser.get_column(column="latitude"))
 
-        x, y = Cleaner.eliminate_nans(x, y)
+        x, y = Cleaner.eliminate_and_synchronize_nans(x, y)
 
         # Plotting
         title = "Geographical heatmap of terrorism attacks"
@@ -37,7 +37,7 @@ class Computer:
         if heatmap:
             Plotter.plot_heatmap_1(x, y,
                                    title=title,
-                                   filename=os.path.join(self.plot_dir, "heatmap_"+filename),
+                                   filename=os.path.join(self.plot_dir, "heatmap_" + filename),
                                    xlabel=xlabel,
                                    ylabel=ylabel)
         else:
@@ -73,7 +73,7 @@ class Computer:
         lg = copy.deepcopy(self.gt_parser.get_column(column="longitude"))
         lat = copy.deepcopy(self.gt_parser.get_column(column="latitude"))
 
-        lg, lat = Cleaner.eliminate_nans(lg, lat)
+        lg, lat = Cleaner.eliminate_and_synchronize_nans(lg, lat)
         X = [[float(i), float(i * 2)] for i in lg]
         y = [int(i) for i in lat]
         neigh = KNeighborsClassifier()
