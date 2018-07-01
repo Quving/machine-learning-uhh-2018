@@ -13,7 +13,11 @@ from scipy.stats import gaussian_kde
 class GlobalTerrorismDBParser:
     def __init__(self):
         """ Reads in the csv file and stores it as DataFrame object. """
-
+        self.font = {'family': 'serif',
+                     'color': 'darkred',
+                     'weight': 'normal',
+                     'size': 16,
+                     }
         self.data_dir = "data"
         self.plot_dir = "plots"
         self.data_filename = "globalterrorismdb_0617dist.csv"
@@ -49,7 +53,9 @@ class GlobalTerrorismDBParser:
 
         return list(out)
 
-    def plot_histogram_for_column(self, column_name, bins, xlabel, ylabel, info_threshold):
+    def plot_histogram_for_column(self, column_name, bins, xlabel, ylabel, info_threshold,
+                                  textbox_x_positional_percentage=0.75,
+                                  textbox_drop_percentage=0.05):
         """
         Plots a histogram of a given column_column_name.
         :param column_name:
@@ -68,15 +74,16 @@ class GlobalTerrorismDBParser:
         distribution = np.where(hist >= min(max_n_elements))[0]
         interests = [hist[i] for i in distribution]
         distribution[:] = list(map(lambda x: math.floor(x * bin_size), distribution))
+
         plt.gcf().clear()
         for x, y in zip(distribution, interests):
-
-            plt.annotate("x: " + str(x) + "-" + str(int(x + bin_size)) + ", \ny: " + str(y),
+            plt.annotate("x: " + str(x) + "-" + str(int(x + bin_size)) + " \ny: " + str(y),
                          xy=(x, y),
-                         xytext=(0.75 * (max(column) + math.fabs(min(column))), y),
+                         xytext=(textbox_x_positional_percentage * (max(column) + math.fabs(min(column))),
+                                 y - textbox_drop_percentage * max(max_n_elements)),
                          style='italic',
                          arrowprops=dict(facecolor='black', shrink=0.05),
-                         bbox={'facecolor': 'red', 'alpha': 0.5, 'pad': 5})
+                         bbox={'facecolor': 'red', 'alpha': 0.5, 'pad': 2.5})
 
         n, bins_2, patches = plt.hist(column,
                                       bins=bins,
@@ -85,7 +92,7 @@ class GlobalTerrorismDBParser:
 
         plt.xlabel(xlabel)
         plt.ylabel(ylabel)
-        plt.title("Histogram for column '" + column_name + "'")
+        plt.title("Histogram for column '" + column_name + "'", fontdict=self.font)
         plt.savefig(os.path.join(self.plot_dir, column_name + "_histogram.png"),
                     dpi='figure',
                     bbox_inches='tight')
@@ -138,7 +145,7 @@ class GlobalTerrorismDBParser:
         z = gaussian_kde(lg_lat)(lg_lat)
 
         plt.gcf().clear()
-        plt.title(title)
+        plt.title(title, fontdict=self.font)
         plt.ylabel(ylabel)
         plt.xlabel(xlabel)
         plt.scatter(lg, lat, c=z, s=2.5, alpha=1)
