@@ -128,6 +128,7 @@ Alternatively, it is possible to use the data of hostage / kidnapping attacks, s
 # References
 
 [1] START CONSORTIUM: Global Terrorism Database, Version 2,  https://www.kaggle.com/START-UMD/gtd (last visit on 29th of June, 2018, 20:02)
+
 [2] DOCUMENTATION FOR GTD DATABASE https://www.start.umd.edu/gtd/downloads/Codebook.pdf
 
 # Appendix A: Table of columns
