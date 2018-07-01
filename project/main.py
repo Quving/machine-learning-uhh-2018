@@ -23,7 +23,8 @@ if __name__ == "__main__":
     #                                    info_threshold=3)
 
     # Plot geographic map (heatmap)
-    computer.plot_geographical_heatmap(filename="geographic_map_1.png", heatmap=False)
+    computer.plot_geographical_heatmap(filename="geomap.png",
+                                       heatmap=False)
 
 
 
