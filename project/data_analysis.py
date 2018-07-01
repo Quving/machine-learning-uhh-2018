@@ -4,6 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import plotter as plotter
 import scipy.stats as stats
+import math
 
 
 
@@ -17,15 +18,34 @@ def read_data(filename):
     # 8 Country TXT
     # 12 City
 
-    raw = pd.read_csv(filename, encoding = "ISO-8859-1")
+    raw = pd.read_csv(filename, encoding = "ISO-8859-1", usecols=lambda x: x not in ['attacktype2','claims2','claimmode2','claimmode3','gname2'])
 
     # Make for each column a nparray
 
     data = {}
 
-    for columnname in raw.columns.values:
+    num_of_columns = len(raw.columns.values)
+
+    print('Starting data reading and data augmentation process...')
+
+    for i, columnname in zip(range(0,num_of_columns),raw.columns.values):
         columndata = np.array(raw[columnname])
-        data[columnname] = {'data': columndata, 'labels': [], 'mean': '', 'median': '', 'variance' : '', 'shapiro_W': '', 'shapiro_p': ''}
+
+        is_categorial = columnname != 'eventid' and columnname != 'latitude' and columnname != 'longitude' and (columnname[0] != "n" or columnname[0:2] != 'INT' or columnname[0] != "i")
+
+        data[columnname] = {'data': columndata, 'labels': [], 'mean': '', 'median': '', 'variance' : '', 'shapiro_W': '', 'shapiro_p': '', 'isCategorial': is_categorial, 'isBool':False}
+
+        print('{}{} Data reading (key: {}, column {} of {})                '.format('█' * math.floor((i/num_of_columns)*20),'░' * math.ceil(20-(i/num_of_columns)*20),columnname,i, num_of_columns), end='\r')
+
+        if is_categorial and columndata.dtype != 'object':
+            indexes = np.sort(np.unique(columndata[~np.isnan(columndata)]))
+
+            for index in indexes:
+                print('{}{} Data augmentation (index {} for key: {}, column {} of {})                '.format('█' * math.floor((i/num_of_columns)*20),'░' * math.ceil(20-(i/num_of_columns)*20),index, columnname,i, num_of_columns), end='\r')
+
+                ix_columndata = columndata == index
+                data[columnname+'_'+str(index)] = {'data': ix_columndata, 'labels': [], 'mean': '', 'median': '', 'variance' : '', 'shapiro_W': '', 'shapiro_p': '', 'isCategorial': True, 'isBool':True}
+
 
     return data
 
@@ -168,15 +188,20 @@ def calculate_correlations(data, alpha=0.5):
 
             corrcoef = np.corrcoef(datacolumn,datacolumn2)
 
-            coef_XY = corrcoef[0][1]
-            coef_YX = corrcoef[1][0]
+            if data[key]['isCategorial'] and data[key2]['isCategorial']:
+                corrcoef = np.corrcoef(datacolumn,datacolumn2)[0][1]
+            elif not data[key]['isCategorial'] and data[key2]['isCategorial']:
+                corrcoef = np.corrcoef(datacolumn,datacolumn2)[0][1]
+            elif data[key]['isCategorial'] and not data[key2]['isCategorial']:
+                corrcoef = np.corrcoef(datacolumn,datacolumn2)[0][1]
+            elif not data[key]['isCategorial'] and not data[key2]['isCategorial']:
+                corrcoef = np.corrcoef(datacolumn,datacolumn2)[0][1]
 
-            coef_matrix[data_keys.index(key)][data_keys.index(key2)] = coef_XY
-            coef_matrix[data_keys.index(key2)][data_keys.index(key)] = coef_YX
+            coef_matrix[data_keys.index(key)][data_keys.index(key2)] = corrcoef
 
-            if abs(coef_XY) > alpha:
+            if abs(corrcoef) > alpha:
                 correlating_pairs.append([key, key2])
-                print('|%s|%s|%0.2f|' % (key, key2, coef_XY))
+                print('|%s|%s|%0.2f|' % (key, key2, corrcoef))
 
     plt.gcf().clear()
 
@@ -189,7 +214,7 @@ def calculate_correlations(data, alpha=0.5):
     plt.yticks(line_y, data_keys)
 
     plt.plot(line_x,line_y, 'ro', c="r", label="identity line")
-    plotter.plotfinisher("Corelation coefficiencies of each column", savefig=True, legend=True, figpath='plots', filename='correlations', show=False)
+    plotter.plotfinisher("Corelation coefficiencies of each column", savefig=True, legend=True, figpath='plots', filename='correlations', show=True)
 
 
     return coef_matrix, correlating_pairs
@@ -202,16 +227,16 @@ data = read_data(filename)
 
 # Add natlty_differ for hypothesis
 natlty_differ = np.array(data['natlty1']['data'] != data['country']['data'], dtype=int)
-data['natlty_differ'] = {'data': natlty_differ, 'labels': [], 'mean': '', 'median': '', 'variance' : '', 'shapiro_W': '', 'shapiro_p': ''}
+data['natlty_differ'] = {'data': natlty_differ, 'labels': [], 'mean': '', 'median': '', 'variance' : '', 'shapiro_W': '', 'shapiro_p': '', 'isCategorial':True, 'isBool': True}
 
 # Add an index list for gname
 gname_index_dict = make_key_id_dict(data['gname']['data'])
 gname_ids = [gname_index_dict[x] for x in data['gname']['data']]
-data['gname_ids'] = {'data': np.array(gname_ids), 'labels': [], 'mean': '', 'median': '', 'variance' : '', 'shapiro_W': '', 'shapiro_p': ''}
+data['gname_ids'] = {'data': np.array(gname_ids), 'labels': [], 'mean': '', 'median': '', 'variance' : '', 'shapiro_W': '', 'shapiro_p': '',  'isCategorial':True, 'isBool': False}
 
-_, correlating_pairs = calculate_correlations(data, alpha=0.5)
+_, correlating_pairs = calculate_correlations(data, alpha=0.3)
 
-data = descriptive_analysis(data, plot=True, pairwise_plot=correlating_pairs)
+data = descriptive_analysis(data, plot=False, pairwise_plot=correlating_pairs)
 
 
 
