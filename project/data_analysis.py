@@ -6,7 +6,8 @@ import plotter as plotter
 import scipy.stats as stats
 import math
 
-
+coef_filename = "table_coefs.md"
+desc_filename = "table_desc_variables.md"
 
 def read_data(filename):
     # Used Columns:
@@ -24,6 +25,8 @@ def read_data(filename):
 
     data = {}
 
+    numerical_columns = ['eventid','imonth','iday','latitude','longitude','nkill','nkillus','nkillter','nwound','nwoundus','nwoundte' ,'nperps','nhostkid','nhostkidus','nhours','nperpcap','propvalue', 'ransomamt','ransomamtus','ransompaid','ransompaidus','ndays','nreleased']
+
     num_of_columns = len(raw.columns.values)
 
     print('Starting data reading and data augmentation process...')
@@ -31,7 +34,7 @@ def read_data(filename):
     for i, columnname in zip(range(0,num_of_columns),raw.columns.values):
         columndata = np.array(raw[columnname])
 
-        is_categorial = columnname != 'eventid' and columnname != 'latitude' and columnname != 'longitude' and (columnname[0] != "n" or columnname[0:2] != 'INT' or columnname[0] != "i")
+        is_categorial = columnname not in numerical_columns
 
         data[columnname] = {'data': columndata, 'labels': [], 'mean': '', 'median': '', 'variance' : '', 'shapiro_W': '', 'shapiro_p': '', 'isCategorial': is_categorial, 'isBool':False}
 
@@ -41,7 +44,7 @@ def read_data(filename):
             indexes = np.sort(np.unique(columndata[~np.isnan(columndata)]))
 
             for index in indexes:
-                print('{}{} Data augmentation (index {} for key: {}, column {} of {})                '.format('█' * math.floor((i/num_of_columns)*20),'░' * math.ceil(20-(i/num_of_columns)*20),index, columnname,i, num_of_columns), end='\r')
+                print('{}{} Data augmentation (index {} for key: {}, column {} of {})                '.format('█' * math.floor((i/num_of_columns)*20),'░' * math.ceil(20-(i/num_of_columns)*20),index, columnname,i, num_of_columns), end="\r")
 
                 ix_columndata = columndata == index
                 data[columnname+'_'+str(index)] = {'data': ix_columndata, 'labels': [], 'mean': '', 'median': '', 'variance' : '', 'shapiro_W': '', 'shapiro_p': '', 'isCategorial': True, 'isBool':True}
@@ -89,6 +92,16 @@ def descriptive_analysis(data, plot=True, pairwise_plot=False):
     if pairwise_plot is not False:
         pairwise_plot_first, pairwise_plot_second = zip(*pairwise_plot)
 
+    tf = open(desc_filename, 'w')
+    tf.write('The descriptive analysis of the data has been made by calculating the mean, median, variance and Shapiro p value for standard deviation test.'.format(alpha,alpha))
+    tf.write('\n')
+    tf.write('\n')
+    tf.write('| id | columname | mean | median | variance | W | normality |')
+    tf.write('\n')
+    tf.write('|-|-|-|-|-|-|-|')
+    tf.write('\n')
+
+
     print('Printing data table with values')
     print('| id | columname | mean | median | variance | W | normality |')
     print('|-|-|-|-|-|-|-|')
@@ -100,22 +113,24 @@ def descriptive_analysis(data, plot=True, pairwise_plot=False):
     for key, datacolumn in data.items():
         column = datacolumn['data']
         if column.dtype != 'object':
-            if key in desc_stats_for:
-                column_wo_nans = column[~np.isnan(column)]
-                col_id = data_keys.index(key)
-                mean = np.mean(column_wo_nans)
-                median = np.median(column_wo_nans)
-                variance = np.var(column_wo_nans)
-                shapiro_W, shapiro_p = stats.shapiro(column_wo_nans)
+            column_wo_nans = column[~np.isnan(column)]
+            col_id = data_keys.index(key)
+            mean = np.mean(column_wo_nans)
+            median = np.median(column_wo_nans)
+            variance = np.var(column_wo_nans)
+            shapiro_W, shapiro_p = stats.shapiro(column_wo_nans)
 
-                datacolumn['mean'] = mean
-                datacolumn['median'] = median
-                datacolumn['variance'] = variance
-                datacolumn['shapiro_W'] = shapiro_W
-                datacolumn['shapiro_p'] = shapiro_p
+            datacolumn['mean'] = mean
+            datacolumn['median'] = median
+            datacolumn['variance'] = variance
+            datacolumn['shapiro_W'] = shapiro_W
+            datacolumn['shapiro_p'] = shapiro_p
 
-                # print('{}: mean: {}, median: {}, variance: {}'.format(key, mean, median, variance))
-                print("| %s | %s | %0.2f | %0.2f | %0.2f | %0.2f | %0.2f |" % (col_id, key, mean, median, variance, shapiro_W, shapiro_p))
+            # print('{}: mean: {}, median: {}, variance: {}'.format(key, mean, median, variance))
+            print("| %s | %s | %0.2f | %0.2f | %0.2f | %0.2f | %0.2f |" % (col_id, key, mean, median, variance, shapiro_W, shapiro_p))
+
+            tf.write("| %s | %s | %0.2f | %0.2f | %0.2f | %0.2f | %0.2f |" % (col_id, key, mean, median, variance, shapiro_W, shapiro_p))
+            tf.write('\n')
 
             if key in lineplots_for and plot:
                 plotter.lines(column, title=key, label=key,figpath='plots',show=False,filename=key+'_lines')
@@ -152,6 +167,8 @@ def descriptive_analysis(data, plot=True, pairwise_plot=False):
 
                     #plotter.scatterheat(column, column2, title=key+' '+key2, label=key + ' ' + key2,figpath='plots',show=False,filename=key+'_'+key2+'_scatterheat')
 
+    tf.close()
+
     return data
 
 def calculate_correlations(data, alpha=0.5):
@@ -160,8 +177,19 @@ def calculate_correlations(data, alpha=0.5):
 
     coef_matrix = np.zeros((len(data_keys),len(data_keys)))
 
+
+    print('\n')
     print('| Column 1 | Column 2 | Coefficient |')
     print('|-|-|-|')
+
+    tf = open(coef_filename, 'w')
+    tf.write('The calculation of the correlation coefficiences is computed with the Pearson correlation coefficient. The results were filtered by an alpha of {}/-{} and are listed below.'.format(alpha,alpha))
+    tf.write('\n')
+    tf.write('\n')
+    tf.write('| Column 1 | Column 2 | Coefficient |')
+    tf.write('\n')
+    tf.write('|-|-|-|')
+    tf.write('\n')
 
     correlating_pairs = []
 
@@ -176,6 +204,8 @@ def calculate_correlations(data, alpha=0.5):
         for key2_id in range(data_keys.index(key)+1,len(data_keys)):
 
             key2 = data_keys[key2_id]
+            print('Calculate correlation for {} vs. {}...                    '.format(key, key2),end="\r")
+
             datacolumn2 = data[key2]['data']
 
             if datacolumn2.dtype == 'object':
@@ -198,11 +228,14 @@ def calculate_correlations(data, alpha=0.5):
                 corrcoef = np.corrcoef(datacolumn,datacolumn2)[0][1]
 
             coef_matrix[data_keys.index(key)][data_keys.index(key2)] = corrcoef
-
+            print('                                                                           ',end="\r")
             if abs(corrcoef) > alpha:
                 correlating_pairs.append([key, key2])
+                tf.write('|%s|%s|%0.2f|' % (key, key2, corrcoef))
+                tf.write('\n')
                 print('|%s|%s|%0.2f|' % (key, key2, corrcoef))
 
+    tf.close()
     plt.gcf().clear()
 
     plt.imshow(coef_matrix)
@@ -234,9 +267,12 @@ gname_index_dict = make_key_id_dict(data['gname']['data'])
 gname_ids = [gname_index_dict[x] for x in data['gname']['data']]
 data['gname_ids'] = {'data': np.array(gname_ids), 'labels': [], 'mean': '', 'median': '', 'variance' : '', 'shapiro_W': '', 'shapiro_p': '',  'isCategorial':True, 'isBool': False}
 
-_, correlating_pairs = calculate_correlations(data, alpha=0.3)
+_, correlating_pairs = calculate_correlations(data, alpha=0.5)
 
 data = descriptive_analysis(data, plot=False, pairwise_plot=correlating_pairs)
 
 
 
+## Supporess warinings
+import warnings
+warnings.filterwarnings("ignore")
