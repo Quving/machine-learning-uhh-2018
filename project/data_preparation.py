@@ -4,20 +4,8 @@ import math
 import os
 
 # Plotter library
-from ggplot import *
-
-### Before everything else: Add extension to pandas DataFrame
-### to accept deprecated sort() call from ggplot
-import builtins
-class DataFrameExtended(pd.DataFrame):
-    def sort(self):
-        if self:
-            return pd.DataFrame.sort_values(self)
-        else:
-            return ''
-
-builtins.DataFrame = DataFrameExtended
-###
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 # Read the data
 
@@ -87,9 +75,62 @@ df['nreleased_p'] = np.divide(np.subtract(np.array(df.nhostkid),np.array(df.nrel
 ### Data plots
 
 # First: a plot about number of kidnapped persons
-print (ggplot(
-    df,
-    aes(x = 'iyear', y = 'nhostkid')
-) + geom_line() + stat_smooth(colour='blue', span=0.2))
+sns.set(style="darkgrid", color_codes=True)
+
+g1 = sns.jointplot(
+    'iyear',
+    'nhostkid',
+    data = df,
+    kind = "reg",
+    color = 'r',
+    size = 7,
+    xlim = [1970,2016]
+)
+g1.set_axis_labels('Years','Number of kidnapped victims')
+
+plt.show()
+plt.gcf().clear()
+
+# Outcomes vs percentage of released victims
+
+g2 = sns.violinplot(
+    x = 'hostkidoutcome',
+    y = 'nreleased_p',
+    data = df,
+    hue = 'ransom'
+)
+
+plt.show()
+plt.gcf().clear()
+
+#### Correlation over all columns
+
+corr = df.corr()
+
+# Generate a mask for the upper triangle
+mask = np.zeros_like(corr, dtype=np.bool)
+mask[np.triu_indices_from(mask)] = True
+
+# Set up the matplotlib figure
+f, ax = plt.subplots(figsize=(11, 9))
+
+# Generate a custom diverging colormap
+cmap = sns.diverging_palette(220, 10, as_cmap=True)
+
+# Draw the heatmap with the mask and correct aspect ratio
+sns.heatmap(
+    corr,
+    mask=mask,
+    cmap=cmap,
+    vmax=.3,
+    center=0,
+    square=True,
+    linewidths=.5,
+    cbar_kws={"shrink": .5}
+)
+
+
+plt.show()
+plt.gcf().clear()
 
 ###
