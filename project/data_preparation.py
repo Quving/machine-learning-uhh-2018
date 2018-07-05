@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 def read_data(filename, usecols=[]):
 
-    df = pd.read_csv(filename, encoding = "ISO-8859-1", usecols=usecols)
+    df = pd.read_csv(filename, encoding = "ISO-8859-1")
     print('Finished reading csv file. Dimensions: {}'.format(df.shape))
 
     return df
@@ -48,7 +48,7 @@ def make_bool_arr(arr, conditions):
 
 # Read data and exclude cols
 # @Snippet: To exclude: lambda x: x not in ["eventid","imonth","iday", "attacktype2","claims2","claimmode2","claimmode3","gname2"]
-df = read_data('globalterrorismdb_0617dist.csv', usecols=['nreleased','attacktype1','attacktype2','attacktype3','extended','iyear','gname','nhostkid','nhours','ndays','ransom','ransompaid','ransompaidus','ishostkid','hostkidoutcome'])
+df = read_data('globalterrorismdb_0617dist.csv')
 
 # Filter for only kidnapping data (1st, 2nd or 3rd attack type)
 kidnap_cats = [5,6]
@@ -70,7 +70,7 @@ df = df[df.nhostkid >= df.nreleased ]
 df['gname_id'],_ = str_to_index_arr(df['gname'])
 
 # Add a normalisation for how many of the hostage victims survived
-df['nreleased_p'] = np.divide(np.subtract(np.array(df.nhostkid),np.array(df.nreleased)),df.nhostkid)
+df['nreleased_p'] = np.divide(df.nreleased,df.nhostkid)
 
 ### Data plots
 
