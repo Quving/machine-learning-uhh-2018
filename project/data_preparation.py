@@ -133,4 +133,23 @@ sns.heatmap(
 plt.show()
 plt.gcf().clear()
 
-###
+### Separate set into train, validation, test by assigning each to the preferred class randomly.
+train = df.sample(frac=0.6, replace=True)
+validation = df.sample(frac=0.2, replace=True)
+test = df.sample(frac=0.2, replace=True)
+
+def separate_labels(df, labels):
+    '''
+    Separates the labels columns from the dataframe and returns the dataframe and the labels
+    '''
+
+    return df.drop(labels, axis = 1), df[labels]
+
+labels = ['hostkidoutcome','nreleased_p']
+train, train_labels = separate_labels(train, labels)
+validation, validation_labels = separate_labels(validation, labels)
+test, test_labels = separate_labels(test, labels)
+
+########
+
+Training
