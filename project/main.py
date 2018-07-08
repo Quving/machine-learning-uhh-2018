@@ -157,7 +157,7 @@ if __name__ == "__main__":
     # df = handle_NaN_in_data(df)
 
     # Plot data
-    visualize_data(df, path="plots_11/")
+    visualize_data(df, path="plots/")
     print(df.columns)
 
     ### Separate set into train, validation, test by assigning each to the preferred class randomly.
