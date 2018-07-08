@@ -1,13 +1,17 @@
 import keras.optimizers as Optimizers
 import pandas as pd
+from keras.models import model_from_json
+
 from keras.layers import Dense
 from keras.models import Sequential
 import os
 import matplotlib.pyplot as plt
+
+
 class Nn:
 
     def __init__(self):
-        self.epochs = 2000
+        self.epochs = 10
         self.learning_rate = 0.0001
         self.batch_size = 20
         self.model_dir = "models"
@@ -59,7 +63,8 @@ class Nn:
                                  validation_data=validation_data)
 
         self.history = history
-        df = pd.DataFrame(list(zip(history.history["val_loss"], history.history["loss"])), columns=["Val_loss", "Training_loss"])
+        df = pd.DataFrame(list(zip(history.history["val_loss"], history.history["loss"])),
+                          columns=["Val_loss", "Training_loss"])
         plt.close('all')
         plt.figure()
         df.plot()
@@ -67,13 +72,36 @@ class Nn:
         return history
 
     def persist_model(self):
-        # Save structure
+        """
+        Persist model to file.
+        :return:
+        """
         with open(os.path.join(self.model_dir, "model.json"), 'w') as outfile:
             outfile.write(self.model.to_json(sort_keys=True, indent=4, separators=(',', ': ')))
             outfile.close()
 
-        # Save weights
         self.model.save(os.path.join(self.model_dir, "model.h5"))
+
+    def load_model_from_json(self):
+        """
+        Load a pre-trained model from file.
+        :return:
+        """
+        filename_full = os.path.join(self.model_dir, "model")
+
+        # Load model structure
+        with open(filename_full + '.json', 'r') as file:
+            model = model_from_json(file.read())
+            file.close()
+            model.load_weights(filename_full + '.h5')
+
+            opt = Optimizers.RMSprop(lr=self.learning_rate, rho=0.9, epsilon=1e-06, decay=0.0)
+            model.compile(optimizer=opt, loss='mse')
+            self.model = model
+
+    def evaluate(self, x, y, batch_size=10):
+        score = self.model.evaluate(x=x, y=y, batch_size=batch_size, verbose=1, sample_weight=None, steps=None)
+        return score
 
 
 class ModelTypeMissmatchException(Exception):
