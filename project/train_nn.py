@@ -11,6 +11,8 @@ import matplotlib.pyplot as plt
 import data_preparation as prep
 
 from nn import Nn
+from sklearn import preprocessing
+
 
 def filter_data(df):
     # Filter for only kidnapping data (1st, 2nd or 3rd attack type)
@@ -187,11 +189,20 @@ if __name__ == "__main__":
     # We have a whole number of columns which contains NaNs for missing data. To overcome those, we simply use the sklearn Imputer to fill the NaNs with the mean values
     df = set_NaN_to_value(df, -1)
 
+
+    head = df.head()
     print(df.head())
 
     # Plot data
     visualize_data(df, path="plots/")
     print('Resulting columns for training: \n{}\n'.format(df.columns))
+
+    # Normalize to 0-1
+    x = df.values
+    x_normed = x / x.max(axis=0)
+
+    df = pd.DataFrame(columns=[head], data=x_normed)
+    print(df)
 
     ### Separate set into train, validation, test by assigning each to the preferred class randomly.
     train = df.sample(frac=0.6, replace=True)
