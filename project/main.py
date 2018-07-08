@@ -86,6 +86,7 @@ def visualize_data(df, path = '', suffix = ''):
     )
     g1.set_axis_labels('Years','Number of kidnapped victims')
 
+    g1.savefig(path+'interaction-iyear_nhostkid'+suffix+'.png')
     g1.savefig(path+'interaction-iyear_nhostkid'+suffix+'.pdf')
     # Outcomes vs percentage of released victims
 
@@ -96,6 +97,7 @@ def visualize_data(df, path = '', suffix = ''):
         hue = 'ransom'
     )
 
+    g2.figure.savefig(path+'interaction-hostkidoutcome_nreleased_p'+suffix+'.png')
     g2.figure.savefig(path+'interaction-hostkidoutcome_nreleased_p'+suffix+'.pdf')
 
     ### Correlation
@@ -124,6 +126,7 @@ def visualize_data(df, path = '', suffix = ''):
         cbar_kws={"shrink": .5}
     )
 
+    g3.figure.savefig(path+'correlation_full'+suffix+'.png')
     g3.figure.savefig(path+'correlation_full'+suffix+'.pdf')
 
 def train(X,Y):
@@ -199,13 +202,27 @@ if __name__ == "__main__":
     X_test, Y_test, Y_test_columns = prep.separate_labels(test, labels)
 
     print('''
+Table of set sizes:
 
-
-
-    ''')
+| Set | Number of features (X) | Number of labels (y) | Number of data|
+|-|-|-|-|
+|Training|{}|{}|{}|
+|Validation|{}|{}|{}|
+|Test|{}|{}|{}|
+    '''.format(
+        len(X_train.columns),
+        len(Y_train.columns),
+        X_train.shape[0],
+        len(X_validation.columns),
+        len(Y_validation.columns),
+        X_validation.shape[0],
+        len(X_test.columns),
+        len(Y_test.columns),
+        X_test.shape[0]
+    ))
 
     ########
     # Training
 
-    svm_model = train_svm(X_train, Y_train_columns[0])
-    prediction = predict_svm(svm_model,X_test)
+    # svm_model = train_svm(X_train, Y_train_columns[0])
+    # prediction = predict_svm(svm_model,X_test)
