@@ -168,6 +168,8 @@ if __name__ == "__main__":
     test = df.sample(frac=0.2, replace=True)
 
     labels = ['hostkidoutcome']
+    # X_train ist ein DataFrame mit den Columns, die als Input Vektor eingebeen werden.
+    #
     X_train, Y_train, Y_train_columns = prep.separate_labels(train, labels)
     X_validation, Y_validation, Y_validation_columns = prep.separate_labels(validation, labels)
     X_test, Y_test, Y_test_columns = prep.separate_labels(test, labels)
