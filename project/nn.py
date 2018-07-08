@@ -38,7 +38,7 @@ class Nn:
         model.summary()
         self.model = model
 
-    def train(self, x, y):
+    def train(self, x, y, validation_data):
         """
         Trains the model accordingly to to class variables.
         :return:
@@ -50,7 +50,7 @@ class Nn:
             raise ModelTypeMissmatchException("Expected object of Sequential. Given " + str(type(self.model)) + ".")
 
 
-        self.model.fit(x=x, y=y, epochs=self.epochs, batch_size=self.batch_size)
+        self.model.fit(x=x, y=y, epochs=self.epochs, batch_size=self.batch_size, validation_data=validation_data)
 
 
 

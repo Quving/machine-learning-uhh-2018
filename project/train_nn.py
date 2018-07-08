@@ -217,4 +217,6 @@ if __name__ == "__main__":
 
     nn = Nn()
     nn.create_model()
-    nn.train(x=X_train, y=Y_train)
+    nn.train(x=X_train.values, y=Y_train.values, validation_data=(X_validation.values, Y_validation.values))
+
+
