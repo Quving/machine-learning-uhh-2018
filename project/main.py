@@ -61,7 +61,7 @@ def handle_NaN_in_data(df):
 
 def set_NaN_to_value(df, value):
 
-    return df.fillna(value)
+    return df.replace(np.nan,value)
 
 def set_unknown_to_NaN(df, unknown_values):
 
@@ -145,7 +145,7 @@ if __name__ == "__main__":
 
     # Read data and exclude cols
     # @Snippet: To exclude: lambda x: x not in ["eventid","imonth","iday", "attacktype2","claims2","claimmode2","claimmode3","gname2"]
-    df = prep.read_data('globalterrorismdb_0617dist.csv', usecols=lambda x: x not in ['eventid','imonth','iday','weaptype4','weapsubtype4', 'latitude','longitude'])
+    df = prep.read_data('globalterrorismdb_0617dist.csv', usecols=['nreleased','attacktype1','attacktype2','attacktype3','extended','iyear','gname','nhostkid','nhours','ndays','ransom','ransompaid','ransompaidus','ishostkid','hostkidoutcome'])
     df = filter_data(df)
     df = augmentate_data(df)
 
@@ -154,18 +154,20 @@ if __name__ == "__main__":
 
 
     # We have a whole number of columns which contains NaNs for missing data. To overcome those, we simply use the sklearn Imputer to fill the NaNs with the mean values
-    # df = handle_NaN_in_data(df)
+    df = set_NaN_to_value(df,-1)
+
+    print(df.head())
 
     # Plot data
     visualize_data(df, path="plots/")
-    print(df.columns)
+    print('Resulting columns for training: \n{}\n'.format(df.columns))
 
     ### Separate set into train, validation, test by assigning each to the preferred class randomly.
     train = df.sample(frac=0.6, replace=True)
     validation = df.sample(frac=0.2, replace=True)
     test = df.sample(frac=0.2, replace=True)
 
-    labels = ['hostkidoutcome','nreleased_p']
+    labels = ['hostkidoutcome']
     X_train, Y_train, Y_train_columns = prep.separate_labels(train, labels)
     X_validation, Y_validation, Y_validation_columns = prep.separate_labels(validation, labels)
     X_test, Y_test, Y_test_columns = prep.separate_labels(test, labels)
@@ -173,4 +175,3 @@ if __name__ == "__main__":
     ########
     # Training
 
-    # train(X_train, Y_train)
