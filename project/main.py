@@ -133,6 +133,32 @@ def train(X,Y):
     model = DecisionTreeClassifier()
     model.fit(X_train, Y_train)
 
+def train_svm(X,y, C = 1.0):
+
+    '''
+    Trains the SVM with X as input and y as output data
+
+    Input:
+    - X: Input vector with features
+    - y: Output vector with one label column
+    - C: SVM regularisation parameter
+    '''
+
+    from sklearn.svm import SVC
+
+    svm_model = SVC(kernel='linear', C=C, decision_function_shape='ovr')
+    svm_model.fit(X,y)
+
+    return svm_model
+
+def predict_svm(model, X,y):
+
+    Z = model.predict(X)
+
+    return Z
+
+
+
 if __name__ == "__main__":
 
     #####
@@ -167,11 +193,19 @@ if __name__ == "__main__":
     validation = df.sample(frac=0.2, replace=True)
     test = df.sample(frac=0.2, replace=True)
 
-    labels = ['hostkidoutcome']
+    labels = ['hostkidoutcome','nreleased_p']
     X_train, Y_train, Y_train_columns = prep.separate_labels(train, labels)
     X_validation, Y_validation, Y_validation_columns = prep.separate_labels(validation, labels)
     X_test, Y_test, Y_test_columns = prep.separate_labels(test, labels)
 
+    print('''
+
+
+
+    ''')
+
     ########
     # Training
 
+    svm_model = train_svm(X_train, Y_train_columns[0])
+    prediction = predict_svm(svm_model,X_test)
