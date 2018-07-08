@@ -7,8 +7,8 @@ import matplotlib.pyplot as plt
 class Nn:
 
     def __init__(self):
-        self.epochs = 2000
-        self.learning_rate = 0.0001
+        self.epochs = 10000
+        self.learning_rate = 0.00005
         self.batch_size = 20
         self.model_dir = "models"
         self.model = None
