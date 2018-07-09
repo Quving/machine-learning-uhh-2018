@@ -189,7 +189,6 @@ if __name__ == "__main__":
     # We have a whole number of columns which contains NaNs for missing data. To overcome those, we simply use the sklearn Imputer to fill the NaNs with the mean values
     df = set_NaN_to_value(df, -1)
 
-
     head = df.head()
     print(df.head())
 
@@ -214,13 +213,12 @@ if __name__ == "__main__":
     X_validation, Y_validation, Y_validation_columns = prep.separate_labels(validation, labels)
     X_test, Y_test, Y_test_columns = prep.separate_labels(test, labels)
 
-
     nn = Nn()
     nn.create_model()
-    nn.train(x=X_train.values,
-             y=Y_train.values,
-             validation_data=(X_validation.values, Y_validation.values))
-    nn.persist_model()
-
-
-
+    nn.load_model_from_json()
+    # nn.train(x=X_train.values,
+    #          y=Y_train.values,
+    #          validation_data=(X_validation.values, Y_validation.values))
+    # nn.persist_model()
+    score = nn.evaluate(x=X_test, y=Y_test)
+    print("Achieved Score:", score)
